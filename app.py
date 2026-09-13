@@ -372,6 +372,131 @@ def new_profile():
 @app.route("/generate-pdf/<int:student_index>")
 def generate_pdf(student_index):
 
+    selected_profile_name = session.get(
+        "selected_profile"
+    )
+
+    if not selected_profile_name:
+
+        return render_template(
+            "upload.html",
+            error="Please select a profile first."
+        )
+
+
+    profile = load_profile(
+        config.PROFILE_FOLDER,
+        selected_profile_name
+    )
+
+    if profile is None:
+
+        return render_template(
+            "upload.html",
+            error="Selected profile not found."
+        )
+
+
+    student_results = session.get(
+        "student_results"
+    )
+
+    if not student_results:
+
+        return render_template(
+            "upload.html",
+            error=(
+                "Please upload and process "
+                "an Excel file first."
+            )
+        )
+
+
+    if student_index < 0 or student_index >= len(student_results):
+
+        return render_template(
+            "upload.html",
+            error="Student result not found."
+        )
+
+
+    student_result = student_results[
+        student_index
+    ]
+
+
+    file_name = (
+        str(student_result["Roll No"])
+        + "_"
+        + str(
+            student_result["Student Name"]
+        ).replace(
+            " ",
+            "_"
+        )
+        + ".pdf"
+    )
+
+
+    output_path = (
+        config.GENERATED_FOLDER
+        + "/"
+        + file_name
+    )
+
+
+    generate_student_pdf(
+        student_result,
+        profile,
+        output_path
+    )
+
+
+    return render_template(
+        "result.html",
+        results=student_results,
+        excel_format=session.get(
+            "excel_format"
+        ),
+        profile=profile,
+        profile_name=selected_profile_name,
+        pdf_generated=file_name
+    )
+
+
+# --------------------------------------------------
+# Download PDF
+# --------------------------------------------------
+
+@app.route("/download-pdf/<filename>")
+def download_pdf(filename):
+
+    file_path = (
+        config.GENERATED_FOLDER
+        + "/"
+        + filename
+    )
+
+    if not os.path.exists(file_path):
+
+        return render_template(
+            "upload.html",
+            error="PDF file not found."
+        )
+
+    return send_file(
+        file_path,
+        as_attachment=True
+    )
+
+
+# --------------------------------------------------
+# Generate All PDFs
+# --------------------------------------------------
+
+@app.route("/generate-all-pdfs")
+def generate_all_pdfs():
+
     # ----------------------------------------------
     # Get Selected Profile
     # ----------------------------------------------
@@ -425,67 +550,44 @@ def generate_pdf(student_index):
 
 
     # ----------------------------------------------
-    # Check Student Index
+    # Generate PDF for Every Student
     # ----------------------------------------------
 
-    if student_index < 0 or student_index >= len(student_results):
+    generated_files = []
 
-        return render_template(
-            "upload.html",
-            error="Student result not found."
+    for student_result in student_results:
+
+        file_name = (
+            str(student_result["Roll No"])
+            + "_"
+            + str(
+                student_result["Student Name"]
+            ).replace(
+                " ",
+                "_"
+            )
+            + ".pdf"
+        )
+
+        output_path = (
+            config.GENERATED_FOLDER
+            + "/"
+            + file_name
+        )
+
+        generate_student_pdf(
+            student_result,
+            profile,
+            output_path
+        )
+
+        generated_files.append(
+            file_name
         )
 
 
     # ----------------------------------------------
-    # Get Student Result
-    # ----------------------------------------------
-
-    student_result = student_results[
-        student_index
-    ]
-
-
-    # ----------------------------------------------
-    # Create PDF File Name
-    # ----------------------------------------------
-
-    file_name = (
-        str(student_result["Roll No"])
-        + "_"
-        + str(
-            student_result["Student Name"]
-        ).replace(
-            " ",
-            "_"
-        )
-        + ".pdf"
-    )
-
-
-    # ----------------------------------------------
-    # Create PDF Path
-    # ----------------------------------------------
-
-    output_path = (
-        config.GENERATED_FOLDER
-        + "/"
-        + file_name
-    )
-
-
-    # ----------------------------------------------
-    # Generate PDF
-    # ----------------------------------------------
-
-    generate_student_pdf(
-        student_result,
-        profile,
-        output_path
-    )
-
-
-    # ----------------------------------------------
-    # Show Results Again
+    # Show Results
     # ----------------------------------------------
 
     return render_template(
@@ -496,33 +598,8 @@ def generate_pdf(student_index):
         ),
         profile=profile,
         profile_name=selected_profile_name,
-        pdf_generated=file_name
-    )
-
-
-# --------------------------------------------------
-# Download PDF
-# --------------------------------------------------
-
-@app.route("/download-pdf/<filename>")
-def download_pdf(filename):
-
-    file_path = (
-        config.GENERATED_FOLDER
-        + "/"
-        + filename
-    )
-
-    if not os.path.exists(file_path):
-
-        return render_template(
-            "upload.html",
-            error="PDF file not found."
-        )
-
-    return send_file(
-        file_path,
-        as_attachment=True
+        generated_files=generated_files,
+        bulk_generated=True
     )
 
 

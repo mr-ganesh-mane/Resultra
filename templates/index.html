@@ -1,21 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Resultra</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Resultra - Home</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
 </head>
+
 
 <body>
 
+    <!-- Header -->
+
     <h1>Resultra</h1>
 
-    <p>Smart Results. Simple Generation.</p>
+    <p>
+        <strong>Smart Results. Simple Generation.</strong>
+    </p>
 
-    <p>Excel-Based Student Result PDF Generator</p>
+    <p>
+        Configurable Excel-Based Student Result PDF Generator
+    </p>
+
+
+    <hr>
+
+
+    <!-- Main Navigation -->
+
+    <h2>Get Started</h2>
+
+
+    <p>
+        <a href="{{ url_for('upload') }}">
+            Upload Excel & Generate Results
+        </a>
+    </p>
+
+
+    <p>
+        <a href="{{ url_for('profiles') }}">
+            Manage Result Profiles
+        </a>
+    </p>
+
+
+    <p>
+        <a href="{{ url_for('new_profile') }}">
+            Create New Profile
+        </a>
+    </p>
+
+
+    <hr>
+
+
+    <!-- Project Workflow -->
+
+    <h2>How Resultra Works</h2>
+
+    <ol>
+
+        <li>
+            Select or create a result profile.
+        </li>
+
+        <li>
+            Upload student marks Excel file.
+        </li>
+
+        <li>
+            Validate the Excel data.
+        </li>
+
+        <li>
+            Calculate student results.
+        </li>
+
+        <li>
+            Generate individual or bulk result PDFs.
+        </li>
+
+        <li>
+            Download generated PDFs.
+        </li>
+
+    </ol>
+
+
+    <hr>
+
+
+    <!-- Current Features -->
+
+    <h2>Features</h2>
+
+    <ul>
+
+        <li>
+            Excel-based student marks processing
+        </li>
+
+        <li>
+            Excel validation
+        </li>
+
+        <li>
+            Configurable result rules
+        </li>
+
+        <li>
+            Reusable result profiles
+        </li>
+
+        <li>
+            Student result calculation
+        </li>
+
+        <li>
+            Individual PDF generation
+        </li>
+
+        <li>
+            Bulk PDF generation
+        </li>
+
+        <li>
+            PDF download
+        </li>
+
+    </ul>
+
+
+    <hr>
+
+
+    <!-- Quick Links -->
+
+    <h2>Quick Links</h2>
+
+    <p>
+        <a href="{{ url_for('upload') }}">
+            Upload Excel
+        </a>
+    </p>
+
+    <p>
+        <a href="{{ url_for('profiles') }}">
+            Profiles
+        </a>
+    </p>
+
+    <p>
+        <a href="{{ url_for('new_profile') }}">
+            New Profile
+        </a>
+    </p>
+
+
+    <hr>
+
+
+    <!-- Footer -->
+
+    <p>
+        Resultra
+    </p>
+
+    <p>
+        Smart Results. Simple Generation.
+    </p>
 
 </body>
+
 </html>
