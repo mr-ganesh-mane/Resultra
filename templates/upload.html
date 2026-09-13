@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Upload Excel - Resultra</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <h1>Upload Excel File</h1>
+
+    <p>
+        Upload the student marks Excel file.
+    </p>
+
+    {% if error %}
+
+        <p>{{ error }}</p>
+
+    {% endif %}
+
+
+    {% if success %}
+
+        <p>{{ success }}</p>
+
+        <p>
+            Detected Format:
+            <strong>{{ excel_format }}</strong>
+        </p>
+
+    {% endif %}
+
+
+    {% if errors %}
+
+        <h3>Validation Errors</h3>
+
+        <ul>
+
+            {% for error in errors %}
+
+                <li>{{ error }}</li>
+
+            {% endfor %}
+
+        </ul>
+
+    {% endif %}
+
+
+    <form
+        action="{{ url_for('upload') }}"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        <label for="excel_file">
+            Select Excel File:
+        </label>
+
+        <br><br>
+
+        <input
+            type="file"
+            id="excel_file"
+            name="excel_file"
+            accept=".xlsx,.xls"
+            required
+        >
+
+        <br><br>
+
+        <button type="submit">
+            Upload & Validate
+        </button>
+
+    </form>
+
+</body>
+
+</html>
