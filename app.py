@@ -4,6 +4,7 @@ import config
 
 from core.excel_reader import read_excel
 from core.excel_validator import validate_excel
+from core.result_calculator import calculate_student_result
 
 
 app = Flask(__name__)
@@ -44,19 +45,46 @@ def upload():
     file.save(file_path)
 
     try:
+
+        # Read Excel
         result = read_excel(file_path)
 
+        # Validate Excel
         errors = validate_excel(result)
 
         if errors:
+
             return render_template(
                 "upload.html",
                 errors=errors
             )
 
+        # Check format
+        if result["format"] != "single_sheet":
+
+            return render_template(
+                "upload.html",
+                error="Subject-wise Excel format will be added next."
+            )
+
+        data = result["data"]
+
+        # Calculate student results
+        student_results = []
+
+        for _, row in data.iterrows():
+
+            student_data = row.to_dict()
+
+            student_result = calculate_student_result(
+                student_data
+            )
+
+            student_results.append(student_result)
+
         return render_template(
-            "upload.html",
-            success="Excel file uploaded and validated successfully.",
+            "result.html",
+            results=student_results,
             excel_format=result["format"]
         )
 

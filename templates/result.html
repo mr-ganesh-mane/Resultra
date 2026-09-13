@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Results - Resultra</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <h1>Student Results</h1>
+
+    <p>
+        Excel Format:
+        <strong>{{ excel_format }}</strong>
+    </p>
+
+
+    {% for student in results %}
+
+        <hr>
+
+        <h2>
+            {{ student["Student Name"] }}
+        </h2>
+
+        <p>
+            Roll No:
+            <strong>{{ student["Roll No"] }}</strong>
+        </p>
+
+
+        <h3>Subject Results</h3>
+
+        <table border="1" cellpadding="8">
+
+            <tr>
+
+                <th>Subject</th>
+
+                <th>Marks</th>
+
+                <th>Grade</th>
+
+                <th>Status</th>
+
+            </tr>
+
+
+            {% for subject, result in student["subjects"].items() %}
+
+                <tr>
+
+                    <td>
+                        {{ subject }}
+                    </td>
+
+                    <td>
+                        {{ result["marks"] }}
+                    </td>
+
+                    <td>
+                        {{ result["grade"] }}
+                    </td>
+
+                    <td>
+                        {{ result["status"] }}
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+        </table>
+
+
+        <h3>Final Result</h3>
+
+        <table border="1" cellpadding="8">
+
+            <tr>
+
+                <th>Total Marks</th>
+
+                <td>
+                    {{ student["total"] }}
+                    /
+                    {{ student["maximum_marks"] }}
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>Percentage</th>
+
+                <td>
+                    {{ student["percentage"] }}%
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <th>Result</th>
+
+                <td>
+                    <strong>
+                        {{ student["result"] }}
+                    </strong>
+                </td>
+
+            </tr>
+
+        </table>
+
+    {% endfor %}
+
+
+    <br><br>
+
+    <a href="{{ url_for('upload') }}">
+        Upload Another Excel File
+    </a>
+
+</body>
+
+</html>
