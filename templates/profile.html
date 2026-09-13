@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Profile - Resultra</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <h1>Create Result Profile</h1>
+
+    {% if error %}
+
+        <p>{{ error }}</p>
+
+    {% endif %}
+
+
+    {% if success %}
+
+        <p>{{ success }}</p>
+
+    {% endif %}
+
+
+    <form
+        action="{{ url_for('new_profile') }}"
+        method="POST"
+    >
+
+        <label>
+            Profile Name:
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            name="profile_name"
+            required
+        >
+
+        <br><br>
+
+
+        <label>
+            Department:
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            name="department"
+        >
+
+        <br><br>
+
+
+        <label>
+            Course:
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            name="course"
+        >
+
+        <br><br>
+
+
+        <label>
+            Class:
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            name="class"
+        >
+
+        <br><br>
+
+
+        <label>
+            Semester:
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            name="semester"
+        >
+
+        <br><br>
+
+
+        <label>
+            Academic Year:
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            name="academic_year"
+        >
+
+        <br><br>
+
+
+        <label>
+            Examination:
+        </label>
+
+        <br>
+
+        <input
+            type="text"
+            name="examination"
+        >
+
+        <br><br>
+
+
+        <button type="submit">
+            Save Profile
+        </button>
+
+    </form>
+
+    <br>
+
+    <a href="{{ url_for('profiles') }}">
+        View Profiles
+    </a>
+
+</body>
+
+</html>
