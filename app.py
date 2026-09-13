@@ -181,7 +181,7 @@ def upload():
 
 
         # ------------------------------------------
-        # Show Results
+        # Show Result Preview
         # ------------------------------------------
 
         return render_template(
@@ -189,7 +189,8 @@ def upload():
             results=student_results,
             excel_format=excel_result["format"],
             profile=profile,
-            profile_name=selected_profile
+            profile_name=selected_profile,
+            preview=True
         )
 
 
@@ -366,7 +367,7 @@ def new_profile():
 
 
 # --------------------------------------------------
-# Generate PDF
+# Generate PDF and Preview
 # --------------------------------------------------
 
 @app.route("/generate-pdf/<int:student_index>")
@@ -384,6 +385,8 @@ def generate_pdf(student_index):
         )
 
 
+    # Load Profile
+
     profile = load_profile(
         config.PROFILE_FOLDER,
         selected_profile_name
@@ -396,6 +399,8 @@ def generate_pdf(student_index):
             error="Selected profile not found."
         )
 
+
+    # Get Student Results
 
     student_results = session.get(
         "student_results"
@@ -412,6 +417,8 @@ def generate_pdf(student_index):
         )
 
 
+    # Check Student Index
+
     if student_index < 0 or student_index >= len(student_results):
 
         return render_template(
@@ -420,10 +427,14 @@ def generate_pdf(student_index):
         )
 
 
+    # Get Student Result
+
     student_result = student_results[
         student_index
     ]
 
+
+    # Create File Name
 
     file_name = (
         str(student_result["Roll No"])
@@ -438,12 +449,16 @@ def generate_pdf(student_index):
     )
 
 
+    # Create File Path
+
     output_path = (
         config.GENERATED_FOLDER
         + "/"
         + file_name
     )
 
+
+    # Generate PDF
 
     generate_student_pdf(
         student_result,
@@ -452,15 +467,13 @@ def generate_pdf(student_index):
     )
 
 
-    return render_template(
-        "result.html",
-        results=student_results,
-        excel_format=session.get(
-            "excel_format"
-        ),
-        profile=profile,
-        profile_name=selected_profile_name,
-        pdf_generated=file_name
+    # Redirect to PDF Preview
+
+    return redirect(
+        url_for(
+            "preview_pdf",
+            filename=file_name
+        )
     )
 
 
@@ -491,15 +504,38 @@ def download_pdf(filename):
 
 
 # --------------------------------------------------
+# Preview PDF
+# --------------------------------------------------
+
+@app.route("/preview-pdf/<filename>")
+def preview_pdf(filename):
+
+    file_path = (
+        config.GENERATED_FOLDER
+        + "/"
+        + filename
+    )
+
+    if not os.path.exists(file_path):
+
+        return render_template(
+            "upload.html",
+            error="PDF file not found."
+        )
+
+    return send_file(
+        file_path,
+        mimetype="application/pdf",
+        as_attachment=False
+    )
+
+
+# --------------------------------------------------
 # Generate All PDFs
 # --------------------------------------------------
 
 @app.route("/generate-all-pdfs")
 def generate_all_pdfs():
-
-    # ----------------------------------------------
-    # Get Selected Profile
-    # ----------------------------------------------
 
     selected_profile_name = session.get(
         "selected_profile"
@@ -513,9 +549,7 @@ def generate_all_pdfs():
         )
 
 
-    # ----------------------------------------------
     # Load Profile
-    # ----------------------------------------------
 
     profile = load_profile(
         config.PROFILE_FOLDER,
@@ -530,9 +564,7 @@ def generate_all_pdfs():
         )
 
 
-    # ----------------------------------------------
     # Get Student Results
-    # ----------------------------------------------
 
     student_results = session.get(
         "student_results"
@@ -549,9 +581,7 @@ def generate_all_pdfs():
         )
 
 
-    # ----------------------------------------------
-    # Generate PDF for Every Student
-    # ----------------------------------------------
+    # Generate All PDFs
 
     generated_files = []
 
@@ -586,9 +616,7 @@ def generate_all_pdfs():
         )
 
 
-    # ----------------------------------------------
     # Show Results
-    # ----------------------------------------------
 
     return render_template(
         "result.html",
@@ -599,7 +627,8 @@ def generate_all_pdfs():
         profile=profile,
         profile_name=selected_profile_name,
         generated_files=generated_files,
-        bulk_generated=True
+        bulk_generated=True,
+        preview=True
     )
 
 

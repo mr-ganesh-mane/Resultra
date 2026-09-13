@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Results - Resultra</title>
+    <title>Result Preview - Resultra</title>
 
     <link
         rel="stylesheet"
@@ -22,7 +22,18 @@
 
 <body>
 
-    <h1>Student Results</h1>
+    <h1>Result Preview</h1>
+
+
+    {% if preview %}
+
+        <p>
+            <strong>
+                Review the result before generating the PDF.
+            </strong>
+        </p>
+
+    {% endif %}
 
 
     <!-- Profile Information -->
@@ -89,13 +100,17 @@
     </p>
 
 
-    <!-- Bulk PDF Button -->
+    <hr>
+
+
+    <!-- PDF Actions -->
 
     <h2>PDF Generation</h2>
 
     <p>
-        Generate result PDFs for all students at once.
+        Review the results below before generating PDFs.
     </p>
+
 
     <a href="{{ url_for('generate_all_pdfs') }}">
         Generate All PDFs
@@ -110,42 +125,22 @@
     {% if bulk_generated %}
 
         <p>
+
             <strong>
                 All student PDFs generated successfully.
             </strong>
+
         </p>
 
         <p>
+
             Total PDFs generated:
+
             <strong>
                 {{ generated_files|length }}
             </strong>
-        </p>
-
-    {% endif %}
-
-
-    <!-- Individual PDF Success -->
-
-    {% if pdf_generated %}
-
-        <p>
-
-            PDF generated successfully:
-
-            <strong>
-                {{ pdf_generated }}
-            </strong>
 
         </p>
-
-        <a
-            href="{{ url_for('download_pdf', filename=pdf_generated) }}"
-        >
-            Download PDF
-        </a>
-
-        <br><br>
 
     {% endif %}
 
@@ -167,6 +162,15 @@
                     -
 
                     <a
+                        href="{{ url_for('preview_pdf', filename=file_name) }}"
+                        target="_blank"
+                    >
+                        Preview
+                    </a>
+
+                    |
+
+                    <a
                         href="{{ url_for('download_pdf', filename=file_name) }}"
                     >
                         Download
@@ -181,11 +185,22 @@
     {% endif %}
 
 
-    <!-- Student Results -->
+    <hr>
+
+
+    <!-- Student Result Preview -->
+
+    <h2>Student Result Preview</h2>
+
 
     {% for student in results %}
 
         <hr>
+
+
+        <h3>
+            Student {{ loop.index }}
+        </h3>
 
 
         <h2>
@@ -207,6 +222,7 @@
         <!-- Subject Results -->
 
         <h3>Subject Results</h3>
+
 
         <table border="1" cellpadding="8">
 
@@ -257,6 +273,7 @@
 
         <h3>Final Result</h3>
 
+
         <table border="1" cellpadding="8">
 
             <tr>
@@ -281,7 +298,9 @@
                 <th>Percentage</th>
 
                 <td>
+
                     {{ student["percentage"] }}%
+
                 </td>
 
             </tr>
@@ -307,12 +326,12 @@
         <br>
 
 
-        <!-- Individual PDF -->
+        <!-- Generate and Preview PDF -->
 
         <a
             href="{{ url_for('generate_pdf', student_index=loop.index0) }}"
         >
-            Generate PDF
+            Generate & Preview PDF
         </a>
 
 
@@ -323,28 +342,37 @@
 
     <hr>
 
-    <br>
-
 
     <!-- Navigation -->
 
-    <a href="{{ url_for('upload') }}">
-        Upload Another Excel File
-    </a>
-
-    <br><br>
+    <h3>Navigation</h3>
 
 
-    <a href="{{ url_for('profiles') }}">
-        Manage Profiles
-    </a>
+    <p>
 
-    <br><br>
+        <a href="{{ url_for('upload') }}">
+            Upload Another Excel File
+        </a>
+
+    </p>
 
 
-    <a href="{{ url_for('home') }}">
-        Back to Home
-    </a>
+    <p>
+
+        <a href="{{ url_for('profiles') }}">
+            Manage Profiles
+        </a>
+
+    </p>
+
+
+    <p>
+
+        <a href="{{ url_for('home') }}">
+            Back to Home
+        </a>
+
+    </p>
 
 
 </body>
