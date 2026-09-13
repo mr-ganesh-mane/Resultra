@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_file
 
 import config
+import os
 
 from core.excel_reader import read_excel
 from core.excel_validator import validate_excel
@@ -43,9 +44,7 @@ def home():
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
 
-    selected_profile = session.get(
-        "selected_profile"
-    )
+    selected_profile = session.get("selected_profile")
 
     if request.method == "GET":
 
@@ -53,7 +52,6 @@ def upload():
             "upload.html",
             selected_profile=selected_profile
         )
-
 
     if "excel_file" not in request.files:
 
@@ -63,9 +61,7 @@ def upload():
             selected_profile=selected_profile
         )
 
-
     file = request.files["excel_file"]
-
 
     if file.filename == "":
 
@@ -75,7 +71,6 @@ def upload():
             selected_profile=selected_profile
         )
 
-
     file_path = (
         config.UPLOAD_FOLDER
         + "/"
@@ -83,7 +78,6 @@ def upload():
     )
 
     file.save(file_path)
-
 
     try:
 
@@ -103,7 +97,6 @@ def upload():
         errors = validate_excel(
             excel_result
         )
-
 
         if errors:
 
@@ -141,14 +134,12 @@ def upload():
 
         rules = DEFAULT_RULES
 
-
         if selected_profile:
 
             profile = load_profile(
                 config.PROFILE_FOLDER,
                 selected_profile
             )
-
 
             if profile:
 
@@ -164,17 +155,14 @@ def upload():
 
         student_results = []
 
-
         for _, row in data.iterrows():
 
             student_data = row.to_dict()
-
 
             student_result = calculate_student_result(
                 student_data,
                 rules
             )
-
 
             student_results.append(
                 student_result
@@ -228,7 +216,6 @@ def profiles():
         config.PROFILE_FOLDER
     )
 
-
     return render_template(
         "profiles.html",
         profiles=profile_names
@@ -247,7 +234,6 @@ def view_profile(profile_name):
         profile_name
     )
 
-
     if profile is None:
 
         return render_template(
@@ -257,7 +243,6 @@ def view_profile(profile_name):
             ),
             error="Profile not found."
         )
-
 
     return render_template(
         "profile.html",
@@ -278,7 +263,6 @@ def use_profile(profile_name):
         profile_name
     )
 
-
     if profile is None:
 
         return render_template(
@@ -289,9 +273,7 @@ def use_profile(profile_name):
             error="Profile not found."
         )
 
-
     session["selected_profile"] = profile_name
-
 
     return render_template(
         "upload.html",
@@ -316,11 +298,9 @@ def new_profile():
             "profile.html"
         )
 
-
     profile_name = request.form.get(
         "profile_name"
     )
-
 
     if not profile_name:
 
@@ -328,7 +308,6 @@ def new_profile():
             "profile.html",
             error="Profile name is required."
         )
-
 
     profile = {
 
@@ -362,9 +341,7 @@ def new_profile():
             ""
         ),
 
-
         "rules": DEFAULT_RULES,
-
 
         "design": {
 
@@ -376,13 +353,11 @@ def new_profile():
 
     }
 
-
     save_profile(
         config.PROFILE_FOLDER,
         profile_name,
         profile
     )
-
 
     return render_template(
         "profile.html",
@@ -405,7 +380,6 @@ def generate_pdf(student_index):
         "selected_profile"
     )
 
-
     if not selected_profile_name:
 
         return render_template(
@@ -423,7 +397,6 @@ def generate_pdf(student_index):
         selected_profile_name
     )
 
-
     if profile is None:
 
         return render_template(
@@ -440,7 +413,6 @@ def generate_pdf(student_index):
         "student_results"
     )
 
-
     if not student_results:
 
         return render_template(
@@ -456,7 +428,7 @@ def generate_pdf(student_index):
     # Check Student Index
     # ----------------------------------------------
 
-    if student_index >= len(student_results):
+    if student_index < 0 or student_index >= len(student_results):
 
         return render_template(
             "upload.html",
@@ -525,6 +497,32 @@ def generate_pdf(student_index):
         profile=profile,
         profile_name=selected_profile_name,
         pdf_generated=file_name
+    )
+
+
+# --------------------------------------------------
+# Download PDF
+# --------------------------------------------------
+
+@app.route("/download-pdf/<filename>")
+def download_pdf(filename):
+
+    file_path = (
+        config.GENERATED_FOLDER
+        + "/"
+        + filename
+    )
+
+    if not os.path.exists(file_path):
+
+        return render_template(
+            "upload.html",
+            error="PDF file not found."
+        )
+
+    return send_file(
+        file_path,
+        as_attachment=True
     )
 
 
