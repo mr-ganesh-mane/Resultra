@@ -6,6 +6,7 @@ from core.excel_reader import read_excel
 from core.excel_validator import validate_excel
 from core.result_calculator import calculate_student_result
 from core.rule_engine import DEFAULT_RULES
+from core.pdf_generator import generate_student_pdf
 
 from core.profile_manager import (
     save_profile,
@@ -75,7 +76,11 @@ def upload():
         )
 
 
-    file_path = config.UPLOAD_FOLDER + "/" + file.filename
+    file_path = (
+        config.UPLOAD_FOLDER
+        + "/"
+        + file.filename
+    )
 
     file.save(file_path)
 
@@ -86,14 +91,18 @@ def upload():
         # Read Excel
         # ------------------------------------------
 
-        excel_result = read_excel(file_path)
+        excel_result = read_excel(
+            file_path
+        )
 
 
         # ------------------------------------------
         # Validate Excel
         # ------------------------------------------
 
-        errors = validate_excel(excel_result)
+        errors = validate_excel(
+            excel_result
+        )
 
 
         if errors:
@@ -106,14 +115,17 @@ def upload():
 
 
         # ------------------------------------------
-        # Check Excel format
+        # Check Excel Format
         # ------------------------------------------
 
         if excel_result["format"] != "single_sheet":
 
             return render_template(
                 "upload.html",
-                error="Subject-wise Excel format will be added next.",
+                error=(
+                    "Subject-wise Excel format "
+                    "will be added next."
+                ),
                 selected_profile=selected_profile
             )
 
@@ -122,7 +134,7 @@ def upload():
 
 
         # ------------------------------------------
-        # Load selected profile
+        # Load Selected Profile
         # ------------------------------------------
 
         profile = None
@@ -147,7 +159,7 @@ def upload():
 
 
         # ------------------------------------------
-        # Calculate student results
+        # Calculate Student Results
         # ------------------------------------------
 
         student_results = []
@@ -170,6 +182,17 @@ def upload():
 
 
         # ------------------------------------------
+        # Store Results in Session
+        # ------------------------------------------
+
+        session["student_results"] = student_results
+
+        session["excel_format"] = (
+            excel_result["format"]
+        )
+
+
+        # ------------------------------------------
         # Show Results
         # ------------------------------------------
 
@@ -186,7 +209,10 @@ def upload():
 
         return render_template(
             "upload.html",
-            error=f"Error processing Excel file: {error}",
+            error=(
+                f"Error processing Excel file: "
+                f"{error}"
+            ),
             selected_profile=selected_profile
         )
 
@@ -270,7 +296,10 @@ def use_profile(profile_name):
     return render_template(
         "upload.html",
         selected_profile=profile_name,
-        success=f"Profile '{profile_name}' selected successfully."
+        success=(
+            f"Profile '{profile_name}' "
+            "selected successfully."
+        )
     )
 
 
@@ -333,7 +362,9 @@ def new_profile():
             ""
         ),
 
+
         "rules": DEFAULT_RULES,
+
 
         "design": {
 
@@ -356,6 +387,144 @@ def new_profile():
     return render_template(
         "profile.html",
         success="Profile saved successfully."
+    )
+
+
+# --------------------------------------------------
+# Generate PDF
+# --------------------------------------------------
+
+@app.route("/generate-pdf/<int:student_index>")
+def generate_pdf(student_index):
+
+    # ----------------------------------------------
+    # Get Selected Profile
+    # ----------------------------------------------
+
+    selected_profile_name = session.get(
+        "selected_profile"
+    )
+
+
+    if not selected_profile_name:
+
+        return render_template(
+            "upload.html",
+            error="Please select a profile first."
+        )
+
+
+    # ----------------------------------------------
+    # Load Profile
+    # ----------------------------------------------
+
+    profile = load_profile(
+        config.PROFILE_FOLDER,
+        selected_profile_name
+    )
+
+
+    if profile is None:
+
+        return render_template(
+            "upload.html",
+            error="Selected profile not found."
+        )
+
+
+    # ----------------------------------------------
+    # Get Student Results
+    # ----------------------------------------------
+
+    student_results = session.get(
+        "student_results"
+    )
+
+
+    if not student_results:
+
+        return render_template(
+            "upload.html",
+            error=(
+                "Please upload and process "
+                "an Excel file first."
+            )
+        )
+
+
+    # ----------------------------------------------
+    # Check Student Index
+    # ----------------------------------------------
+
+    if student_index >= len(student_results):
+
+        return render_template(
+            "upload.html",
+            error="Student result not found."
+        )
+
+
+    # ----------------------------------------------
+    # Get Student Result
+    # ----------------------------------------------
+
+    student_result = student_results[
+        student_index
+    ]
+
+
+    # ----------------------------------------------
+    # Create PDF File Name
+    # ----------------------------------------------
+
+    file_name = (
+        str(student_result["Roll No"])
+        + "_"
+        + str(
+            student_result["Student Name"]
+        ).replace(
+            " ",
+            "_"
+        )
+        + ".pdf"
+    )
+
+
+    # ----------------------------------------------
+    # Create PDF Path
+    # ----------------------------------------------
+
+    output_path = (
+        config.GENERATED_FOLDER
+        + "/"
+        + file_name
+    )
+
+
+    # ----------------------------------------------
+    # Generate PDF
+    # ----------------------------------------------
+
+    generate_student_pdf(
+        student_result,
+        profile,
+        output_path
+    )
+
+
+    # ----------------------------------------------
+    # Show Results Again
+    # ----------------------------------------------
+
+    return render_template(
+        "result.html",
+        results=student_results,
+        excel_format=session.get(
+            "excel_format"
+        ),
+        profile=profile,
+        profile_name=selected_profile_name,
+        pdf_generated=file_name
     )
 
 
