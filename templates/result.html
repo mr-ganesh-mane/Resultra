@@ -23,11 +23,73 @@
 
     <h1>Student Results</h1>
 
+
+    <!-- Profile Information -->
+
+    {% if profile %}
+
+        <h2>Result Profile</h2>
+
+        <table border="1" cellpadding="8">
+
+            <tr>
+                <th>Profile Name</th>
+                <td>{{ profile_name }}</td>
+            </tr>
+
+            <tr>
+                <th>Department</th>
+                <td>{{ profile.department }}</td>
+            </tr>
+
+            <tr>
+                <th>Course</th>
+                <td>{{ profile.course }}</td>
+            </tr>
+
+            <tr>
+                <th>Class</th>
+                <td>{{ profile.class }}</td>
+            </tr>
+
+            <tr>
+                <th>Semester</th>
+                <td>{{ profile.semester }}</td>
+            </tr>
+
+            <tr>
+                <th>Academic Year</th>
+                <td>{{ profile.academic_year }}</td>
+            </tr>
+
+            <tr>
+                <th>Examination</th>
+                <td>{{ profile.examination }}</td>
+            </tr>
+
+        </table>
+
+    {% else %}
+
+        <p>
+            No profile selected.
+        </p>
+
+    {% endif %}
+
+
+    <br>
+
+
+    <!-- Excel Information -->
+
     <p>
         Excel Format:
         <strong>{{ excel_format }}</strong>
     </p>
 
+
+    <!-- Student Results -->
 
     {% for student in results %}
 
@@ -39,11 +101,14 @@
 
         <p>
             Roll No:
-            <strong>{{ student["Roll No"] }}</strong>
+            <strong>
+                {{ student["Roll No"] }}
+            </strong>
         </p>
 
 
         <h3>Subject Results</h3>
+
 
         <table border="1" cellpadding="8">
 
@@ -87,7 +152,11 @@
         </table>
 
 
+        <br>
+
+
         <h3>Final Result</h3>
+
 
         <table border="1" cellpadding="8">
 
@@ -103,6 +172,7 @@
 
             </tr>
 
+
             <tr>
 
                 <th>Percentage</th>
@@ -112,6 +182,7 @@
                 </td>
 
             </tr>
+
 
             <tr>
 
@@ -130,11 +201,28 @@
     {% endfor %}
 
 
-    <br><br>
+    <br>
+    <br>
+
 
     <a href="{{ url_for('upload') }}">
         Upload Another Excel File
     </a>
+
+    <br>
+    <br>
+
+    <a href="{{ url_for('profiles') }}">
+        Manage Profiles
+    </a>
+
+    <br>
+    <br>
+
+    <a href="{{ url_for('home') }}">
+        Back to Home
+    </a>
+
 
 </body>
 

@@ -27,27 +27,49 @@
         Create and manage reusable result profiles.
     </p>
 
+
+    {% if error %}
+
+        <p>
+            {{ error }}
+        </p>
+
+    {% endif %}
+
+
     <a href="{{ url_for('new_profile') }}">
         Create New Profile
     </a>
 
-    <br><br>
+    <br>
+    <br>
+
 
     {% if profiles %}
 
         <h2>Saved Profiles</h2>
 
-        <ul>
+        {% for profile in profiles %}
 
-            {% for profile in profiles %}
+            <div>
 
-                <li>
+                <strong>
                     {{ profile }}
-                </li>
+                </strong>
 
-            {% endfor %}
+                &nbsp;
 
-        </ul>
+                <a
+                    href="{{ url_for('view_profile', profile_name=profile) }}"
+                >
+                    View / Use Profile
+                </a>
+
+            </div>
+
+            <br>
+
+        {% endfor %}
 
     {% else %}
 
@@ -56,6 +78,13 @@
         </p>
 
     {% endif %}
+
+
+    <br>
+
+    <a href="{{ url_for('home') }}">
+        Back to Home
+    </a>
 
 </body>
 
