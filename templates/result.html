@@ -22,246 +22,67 @@
 
 <body>
 
-    <h1>Result Preview</h1>
+    <div class="container">
 
+        <!-- Page Heading -->
 
-    {% if preview %}
+        <h1>Result Preview</h1>
 
-        <p>
-            <strong>
-                Review the result before generating the PDF.
-            </strong>
-        </p>
 
-    {% endif %}
+        {% if preview %}
 
+            <p>
+                <strong>
+                    Review the result before generating the PDF.
+                </strong>
+            </p>
 
-    <!-- Profile Information -->
+        {% endif %}
 
-    {% if profile %}
 
-        <h2>Result Profile</h2>
+        <!-- ====================================== -->
+        <!-- Result Summary -->
+        <!-- ====================================== -->
 
-        <table border="1" cellpadding="8">
-
-            <tr>
-                <th>Profile Name</th>
-                <td>{{ profile_name }}</td>
-            </tr>
-
-            <tr>
-                <th>Department</th>
-                <td>{{ profile.department }}</td>
-            </tr>
-
-            <tr>
-                <th>Course</th>
-                <td>{{ profile.course }}</td>
-            </tr>
-
-            <tr>
-                <th>Class</th>
-                <td>{{ profile.class }}</td>
-            </tr>
-
-            <tr>
-                <th>Semester</th>
-                <td>{{ profile.semester }}</td>
-            </tr>
-
-            <tr>
-                <th>Academic Year</th>
-                <td>{{ profile.academic_year }}</td>
-            </tr>
-
-            <tr>
-                <th>Examination</th>
-                <td>{{ profile.examination }}</td>
-            </tr>
-
-        </table>
-
-    {% endif %}
-
-
-    <br>
-
-
-    <!-- Excel Format -->
-
-    <p>
-
-        Excel Format:
-
-        <strong>
-            {{ excel_format }}
-        </strong>
-
-    </p>
-
-
-    <hr>
-
-
-    <!-- PDF Actions -->
-
-    <h2>PDF Generation</h2>
-
-    <p>
-        Review the results below before generating PDFs.
-    </p>
-
-
-    <a href="{{ url_for('generate_all_pdfs') }}">
-        Generate All PDFs
-    </a>
-
-
-    <br><br>
-
-
-    <!-- Bulk PDF Success -->
-
-    {% if bulk_generated %}
-
-        <p>
-
-            <strong>
-                All student PDFs generated successfully.
-            </strong>
-
-        </p>
-
-        <p>
-
-            Total PDFs generated:
-
-            <strong>
-                {{ generated_files|length }}
-            </strong>
-
-        </p>
-
-    {% endif %}
-
-
-    <!-- Generated PDF List -->
-
-    {% if generated_files %}
-
-        <h3>Generated PDF Files</h3>
-
-        <ul>
-
-            {% for file_name in generated_files %}
-
-                <li>
-
-                    {{ file_name }}
-
-                    -
-
-                    <a
-                        href="{{ url_for('preview_pdf', filename=file_name) }}"
-                        target="_blank"
-                    >
-                        Preview
-                    </a>
-
-                    |
-
-                    <a
-                        href="{{ url_for('download_pdf', filename=file_name) }}"
-                    >
-                        Download
-                    </a>
-
-                </li>
-
-            {% endfor %}
-
-        </ul>
-
-    {% endif %}
-
-
-    <hr>
-
-
-    <!-- Student Result Preview -->
-
-    <h2>Student Result Preview</h2>
-
-
-    {% for student in results %}
-
-        <hr>
-
-
-        <h3>
-            Student {{ loop.index }}
-        </h3>
-
-
-        <h2>
-            {{ student["Student Name"] }}
-        </h2>
-
-
-        <p>
-
-            Roll No:
-
-            <strong>
-                {{ student["Roll No"] }}
-            </strong>
-
-        </p>
-
-
-        <!-- Subject Results -->
-
-        <h3>Subject Results</h3>
-
+        <h2>Result Summary</h2>
 
         <table border="1" cellpadding="8">
 
             <tr>
 
-                <th>Subject</th>
+                <th>Excel Format</th>
 
-                <th>Marks</th>
-
-                <th>Grade</th>
-
-                <th>Status</th>
+                <td>
+                    {{ excel_format }}
+                </td>
 
             </tr>
 
 
-            {% for subject, result in student["subjects"].items() %}
+            <tr>
+
+                <th>Total Students</th>
+
+                <td>
+                    {{ results|length }}
+                </td>
+
+            </tr>
+
+
+            {% if profile_name %}
 
                 <tr>
 
-                    <td>
-                        {{ subject }}
-                    </td>
+                    <th>Selected Profile</th>
 
                     <td>
-                        {{ result["marks"] }}
-                    </td>
-
-                    <td>
-                        {{ result["grade"] }}
-                    </td>
-
-                    <td>
-                        {{ result["status"] }}
+                        {{ profile_name }}
                     </td>
 
                 </tr>
 
-            {% endfor %}
+            {% endif %}
 
         </table>
 
@@ -269,111 +90,417 @@
         <br>
 
 
-        <!-- Final Result -->
+        <!-- ====================================== -->
+        <!-- Profile Information -->
+        <!-- ====================================== -->
 
-        <h3>Final Result</h3>
+        {% if profile %}
 
+            <h2>Result Profile</h2>
 
-        <table border="1" cellpadding="8">
+            <table border="1" cellpadding="8">
 
-            <tr>
+                <tr>
 
-                <th>Total Marks</th>
+                    <th>Profile Name</th>
 
-                <td>
+                    <td>
+                        {{ profile_name }}
+                    </td>
 
-                    {{ student["total"] }}
-
-                    /
-
-                    {{ student["maximum_marks"] }}
-
-                </td>
-
-            </tr>
+                </tr>
 
 
-            <tr>
+                <tr>
 
-                <th>Percentage</th>
+                    <th>Department</th>
 
-                <td>
+                    <td>
+                        {{ profile.department }}
+                    </td>
 
-                    {{ student["percentage"] }}%
-
-                </td>
-
-            </tr>
+                </tr>
 
 
-            <tr>
+                <tr>
 
-                <th>Result</th>
+                    <th>Course</th>
 
-                <td>
+                    <td>
+                        {{ profile.course }}
+                    </td>
 
-                    <strong>
-                        {{ student["result"] }}
-                    </strong>
-
-                </td>
-
-            </tr>
-
-        </table>
+                </tr>
 
 
-        <br>
+                <tr>
+
+                    <th>Class</th>
+
+                    <td>
+                        {{ profile.class }}
+                    </td>
+
+                </tr>
 
 
-        <!-- Generate and Preview PDF -->
+                <tr>
 
-        <a
-            href="{{ url_for('generate_pdf', student_index=loop.index0) }}"
-        >
-            Generate & Preview PDF
+                    <th>Semester</th>
+
+                    <td>
+                        {{ profile.semester }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th>Academic Year</th>
+
+                    <td>
+                        {{ profile.academic_year }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th>Examination</th>
+
+                    <td>
+                        {{ profile.examination }}
+                    </td>
+
+                </tr>
+
+            </table>
+
+        {% endif %}
+
+
+        <hr>
+
+
+        <!-- ====================================== -->
+        <!-- PDF Generation -->
+        <!-- ====================================== -->
+
+        <h2>PDF Generation</h2>
+
+        <p>
+            Review all student results before generating PDFs.
+        </p>
+
+
+        <a href="{{ url_for('generate_all_pdfs') }}">
+
+            <button type="button">
+                Generate All PDFs
+            </button>
+
         </a>
 
 
         <br><br>
 
-    {% endfor %}
+
+        <!-- ====================================== -->
+        <!-- Bulk PDF Success -->
+        <!-- ====================================== -->
+
+        {% if bulk_generated %}
+
+            <p>
+
+                <strong>
+                    All student PDFs generated successfully.
+                </strong>
+
+            </p>
 
 
-    <hr>
+            <p>
+
+                Total PDFs generated:
+
+                <strong>
+                    {{ generated_files|length }}
+                </strong>
+
+            </p>
+
+        {% endif %}
 
 
-    <!-- Navigation -->
+        <!-- ====================================== -->
+        <!-- Generated PDF List -->
+        <!-- ====================================== -->
 
-    <h3>Navigation</h3>
+        {% if generated_files %}
 
+            <h3>Generated PDF Files</h3>
 
-    <p>
+            <table border="1" cellpadding="8">
 
-        <a href="{{ url_for('upload') }}">
-            Upload Another Excel File
-        </a>
+                <tr>
 
-    </p>
+                    <th>File Name</th>
 
+                    <th>Actions</th>
 
-    <p>
-
-        <a href="{{ url_for('profiles') }}">
-            Manage Profiles
-        </a>
-
-    </p>
+                </tr>
 
 
-    <p>
+                {% for file_name in generated_files %}
 
-        <a href="{{ url_for('home') }}">
-            Back to Home
-        </a>
+                    <tr>
 
-    </p>
+                        <td>
+                            {{ file_name }}
+                        </td>
 
+                        <td>
+
+                            <a
+                                href="{{ url_for('preview_pdf', filename=file_name) }}"
+                                target="_blank"
+                            >
+                                Preview
+                            </a>
+
+                            |
+
+                            <a
+                                href="{{ url_for('download_pdf', filename=file_name) }}"
+                            >
+                                Download
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </table>
+
+        {% endif %}
+
+
+        <hr>
+
+
+        <!-- ====================================== -->
+        <!-- Student Results -->
+        <!-- ====================================== -->
+
+        <h2>Student Results</h2>
+
+
+        {% for student in results %}
+
+            <div class="result-card">
+
+                <h3>
+                    Student {{ loop.index }}
+                </h3>
+
+
+                <h2>
+                    {{ student["Student Name"] }}
+                </h2>
+
+
+                <p>
+
+                    Roll No:
+
+                    <strong>
+                        {{ student["Roll No"] }}
+                    </strong>
+
+                </p>
+
+
+                <!-- Subject Results -->
+
+                <h3>Subject Results</h3>
+
+
+                <table border="1" cellpadding="8">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Subject</th>
+
+                            <th>Marks</th>
+
+                            <th>Grade</th>
+
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for subject, result in student["subjects"].items() %}
+
+                            <tr>
+
+                                <td>
+                                    {{ subject }}
+                                </td>
+
+                                <td>
+                                    {{ result["marks"] }}
+                                </td>
+
+                                <td>
+                                    {{ result["grade"] }}
+                                </td>
+
+                                <td>
+
+                                    <strong>
+                                        {{ result["status"] }}
+                                    </strong>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+
+                <br>
+
+
+                <!-- Final Result -->
+
+                <h3>Final Result</h3>
+
+
+                <table border="1" cellpadding="8">
+
+                    <tr>
+
+                        <th>Total Marks</th>
+
+                        <td>
+
+                            {{ student["total"] }}
+
+                            /
+
+                            {{ student["maximum_marks"] }}
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <th>Percentage</th>
+
+                        <td>
+
+                            {{ student["percentage"] }}%
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <th>Result</th>
+
+                        <td>
+
+                            <strong>
+                                {{ student["result"] }}
+                            </strong>
+
+                        </td>
+
+                    </tr>
+
+                </table>
+
+
+                <br>
+
+
+                <!-- Individual PDF -->
+
+                <a
+                    href="{{ url_for('generate_pdf', student_index=loop.index0) }}"
+                >
+
+                    <button type="button">
+                        Generate & Preview PDF
+                    </button>
+
+                </a>
+
+
+                <br><br>
+
+            </div>
+
+
+            <hr>
+
+        {% endfor %}
+
+
+        <!-- ====================================== -->
+        <!-- Navigation -->
+        <!-- ====================================== -->
+
+        <h3>Navigation</h3>
+
+
+        <p>
+
+            <a href="{{ url_for('upload') }}">
+                Upload Another Excel File
+            </a>
+
+        </p>
+
+
+        <p>
+
+            <a href="{{ url_for('profiles') }}">
+                Manage Profiles
+            </a>
+
+        </p>
+
+
+        <p>
+
+            <a href="{{ url_for('home') }}">
+                Back to Home
+            </a>
+
+        </p>
+
+    </div>
 
 </body>
 
