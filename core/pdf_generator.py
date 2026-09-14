@@ -23,7 +23,8 @@ from reportlab.platypus import (
     Paragraph,
     Spacer,
     Table,
-    TableStyle
+    TableStyle,
+    HRFlowable
 )
 
 
@@ -143,55 +144,44 @@ def generate_student_pdf(
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle(
-
         "ResultTitle",
-
         parent=styles["Title"],
-
         alignment=TA_CENTER,
-
         fontSize=18,
+        leading=22,
+        spaceAfter=6
+    )
 
-        spaceAfter=8
-
+    college_style = ParagraphStyle(
+        "CollegeName",
+        parent=styles["Title"],
+        alignment=TA_CENTER,
+        fontSize=20,
+        leading=24,
+        spaceAfter=4
     )
 
     subtitle_style = ParagraphStyle(
-
         "ResultSubtitle",
-
         parent=styles["Normal"],
-
         alignment=TA_CENTER,
-
         fontSize=11,
-
+        leading=14,
         spaceAfter=5
-
     )
 
     center_style = ParagraphStyle(
-
         "Center",
-
         parent=styles["Normal"],
-
         alignment=TA_CENTER,
-
         fontSize=10
-
     )
 
     footer_style = ParagraphStyle(
-
         "Footer",
-
         parent=styles["Normal"],
-
         alignment=TA_CENTER,
-
         fontSize=8
-
     )
 
     story = []
@@ -210,7 +200,7 @@ def generate_student_pdf(
         story.append(
             Paragraph(
                 college_name,
-                title_style
+                college_style
             )
         )
 
@@ -231,6 +221,21 @@ def generate_student_pdf(
                 subtitle_style
             )
         )
+
+    # Header separator
+
+    story.append(
+        Spacer(1, 4)
+    )
+
+    story.append(
+        HRFlowable(
+            width="100%",
+            thickness=1,
+            spaceBefore=2,
+            spaceAfter=8
+        )
+    )
 
     # ========================================
     # PROFILE INFORMATION
@@ -266,65 +271,94 @@ def generate_student_pdf(
         ""
     )
 
-    if department:
+    profile_info = [
+        [
+            "Department",
+            department,
+            "Course",
+            course
+        ],
+        [
+            "Class",
+            class_name,
+            "Semester",
+            semester
+        ],
+        [
+            "Academic Year",
+            academic_year,
+            "Examination",
+            examination
+        ]
+    ]
 
-        story.append(
-            Paragraph(
-                f"<b>Department:</b> "
-                f"{department}",
-                center_style
+    profile_table = Table(
+        profile_info,
+        colWidths=[
+            30 * mm,
+            45 * mm,
+            30 * mm,
+            45 * mm
+        ]
+    )
+
+    profile_table.setStyle(
+        TableStyle([
+            (
+                "GRID",
+                (0, 0),
+                (-1, -1),
+                0.5,
+                colors.black
+            ),
+
+            (
+                "BACKGROUND",
+                (0, 0),
+                (0, -1),
+                colors.lightgrey
+            ),
+
+            (
+                "BACKGROUND",
+                (2, 0),
+                (2, -1),
+                colors.lightgrey
+            ),
+
+            (
+                "FONTNAME",
+                (0, 0),
+                (0, -1),
+                "Helvetica-Bold"
+            ),
+
+            (
+                "FONTNAME",
+                (2, 0),
+                (2, -1),
+                "Helvetica-Bold"
+            ),
+
+            (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "MIDDLE"
+            ),
+
+            (
+                "PADDING",
+                (0, 0),
+                (-1, -1),
+                6
             )
-        )
+        ])
+    )
 
-    if course:
-
-        story.append(
-            Paragraph(
-                f"<b>Course:</b> "
-                f"{course}",
-                center_style
-            )
-        )
-
-    if class_name:
-
-        story.append(
-            Paragraph(
-                f"<b>Class:</b> "
-                f"{class_name}",
-                center_style
-            )
-        )
-
-    if semester:
-
-        story.append(
-            Paragraph(
-                f"<b>Semester:</b> "
-                f"{semester}",
-                center_style
-            )
-        )
-
-    if academic_year:
-
-        story.append(
-            Paragraph(
-                f"<b>Academic Year:</b> "
-                f"{academic_year}",
-                center_style
-            )
-        )
-
-    if examination:
-
-        story.append(
-            Paragraph(
-                f"<b>Examination:</b> "
-                f"{examination}",
-                center_style
-            )
-        )
+    story.append(
+        profile_table
+    )
 
     story.append(
         Spacer(1, 12)
@@ -335,7 +369,6 @@ def generate_student_pdf(
     # ========================================
 
     student_info = [
-
         [
             "Student Name",
             str(
@@ -345,7 +378,6 @@ def generate_student_pdf(
                 )
             )
         ],
-
         [
             "Roll No",
             str(
@@ -355,24 +387,18 @@ def generate_student_pdf(
                 )
             )
         ]
-
     ]
 
     student_table = Table(
-
         student_info,
-
         colWidths=[
-            45 * mm,
-            110 * mm
+            35 * mm,
+            115 * mm
         ]
-
     )
 
     student_table.setStyle(
-
         TableStyle([
-
             (
                 "GRID",
                 (0, 0),
@@ -406,11 +432,9 @@ def generate_student_pdf(
                 "PADDING",
                 (0, 0),
                 (-1, -1),
-                6
+                7
             )
-
         ])
-
     )
 
     story.append(
@@ -499,17 +523,21 @@ def generate_student_pdf(
         )
 
     subject_table = Table(
-
         subject_table_data,
-
+        colWidths=[
+            38 * mm,
+            18 * mm,
+            18 * mm,
+            22 * mm,
+            18 * mm,
+            20 * mm,
+            16 * mm
+        ],
         repeatRows=1
-
     )
 
     subject_table.setStyle(
-
         TableStyle([
-
             (
                 "GRID",
                 (0, 0),
@@ -540,6 +568,13 @@ def generate_student_pdf(
             ),
 
             (
+                "ALIGN",
+                (0, 0),
+                (-1, 0),
+                "CENTER"
+            ),
+
+            (
                 "VALIGN",
                 (0, 0),
                 (-1, -1),
@@ -552,9 +587,7 @@ def generate_student_pdf(
                 (-1, -1),
                 5
             )
-
         ])
-
     )
 
     story.append(
@@ -653,20 +686,15 @@ def generate_student_pdf(
     ]
 
     summary_table = Table(
-
         summary_data,
-
         colWidths=[
-            60 * mm,
-            70 * mm
+            75 * mm,
+            75 * mm
         ]
-
     )
 
     summary_table.setStyle(
-
         TableStyle([
-
             (
                 "GRID",
                 (0, 0),
@@ -704,14 +732,19 @@ def generate_student_pdf(
             ),
 
             (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "MIDDLE"
+            ),
+
+            (
                 "PADDING",
                 (0, 0),
                 (-1, -1),
                 6
             )
-
         ])
-
     )
 
     story.append(
@@ -727,6 +760,19 @@ def generate_student_pdf(
     # ========================================
 
     if footer_text:
+
+        story.append(
+            Spacer(1, 12)
+        )
+
+        story.append(
+            HRFlowable(
+                width="100%",
+                thickness=0.5,
+                spaceBefore=2,
+                spaceAfter=6
+            )
+        )
 
         story.append(
             Paragraph(

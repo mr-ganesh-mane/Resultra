@@ -12,7 +12,9 @@
 
     <title>
         {% if new_profile %}
-            Create New Profile - Resultra
+            Create New Profile
+        {% elif edit_profile %}
+            Edit Profile
         {% else %}
             Profile - Resultra
         {% endif %}
@@ -25,427 +27,674 @@
 
 </head>
 
-
 <body>
 
-    <div class="container">
+    <!-- ======================================== -->
+    <!-- Navigation -->
+    <!-- ======================================== -->
 
+    <nav class="navbar">
 
-        {% if new_profile %}
+        <div class="nav-container">
 
-            <!-- ================================= -->
-            <!-- Create New Profile -->
-            <!-- ================================= -->
+            <div class="logo">
+                Resultra
+            </div>
 
-            <h1>
-                Create New Profile
-            </h1>
+            <div class="nav-links">
 
+                <a href="{{ url_for('home') }}">
+                    Home
+                </a>
 
-            <p>
-                Create a reusable result profile.
-            </p>
+                <a href="{{ url_for('profiles') }}">
+                    Profiles
+                </a>
 
+            </div>
 
-            {% if error %}
+        </div>
 
-                <div class="error">
-                    {{ error }}
-                </div>
+    </nav>
 
-            {% endif %}
 
+    <!-- ======================================== -->
+    <!-- Main Container -->
+    <!-- ======================================== -->
 
-            <form
-                method="POST"
-                action="{{ url_for('new_profile') }}"
-            >
+    <main class="container">
 
 
-                <h2>
-                    Profile Information
-                </h2>
+        <!-- ==================================== -->
+        <!-- Error Message -->
+        <!-- ==================================== -->
 
+        {% if error %}
 
-                <!-- College Name -->
-
-                <label for="college_name">
-                    College Name
-                </label>
-
-                <input
-                    type="text"
-                    id="college_name"
-                    name="college_name"
-                    required
-                >
-
-
-                <!-- Department -->
-
-                <label for="department">
-                    Department
-                </label>
-
-                <input
-                    type="text"
-                    id="department"
-                    name="department"
-                >
-
-
-                <!-- Course -->
-
-                <label for="course">
-                    Course
-                </label>
-
-                <input
-                    type="text"
-                    id="course"
-                    name="course"
-                >
-
-
-                <!-- Class -->
-
-                <label for="class">
-                    Class
-                </label>
-
-                <input
-                    type="text"
-                    id="class"
-                    name="class"
-                >
-
-
-                <!-- Semester -->
-
-                <label for="semester">
-                    Semester
-                </label>
-
-                <input
-                    type="text"
-                    id="semester"
-                    name="semester"
-                >
-
-
-                <!-- Academic Year -->
-
-                <label for="academic_year">
-                    Academic Year
-                </label>
-
-                <input
-                    type="text"
-                    id="academic_year"
-                    name="academic_year"
-                >
-
-
-                <!-- Examination -->
-
-                <label for="examination">
-                    Examination
-                </label>
-
-                <input
-                    type="text"
-                    id="examination"
-                    name="examination"
-                >
-
-
-                <br><br>
-
-
-                <button type="submit">
-                    Create Profile
-                </button>
-
-
-            </form>
-
-
-            <br><br>
-
-
-            <a href="{{ url_for('profiles') }}">
-                Back to Profiles
-            </a>
-
-
-            <br><br>
-
-
-            <a href="{{ url_for('home') }}">
-                Home
-            </a>
-
-
-        {% else %}
-
-
-            <!-- ================================= -->
-            <!-- Existing Profile -->
-            <!-- ================================= -->
-
-            <h1>
-                Profile
-            </h1>
-
-
-            {% if error %}
-
-                <div class="error">
-                    {{ error }}
-                </div>
-
-            {% endif %}
-
-
-            {% if success %}
-
-                <div class="success">
-                    {{ success }}
-                </div>
-
-            {% endif %}
-
-
-            <h2>
-                {{ profile_name }}
-            </h2>
-
-
-            <!-- ================================= -->
-            <!-- Profile Information -->
-            <!-- ================================= -->
-
-            <h2>
-                Profile Information
-            </h2>
-
-
-            <table>
-
-                <tr>
-
-                    <th>
-                        College Name
-                    </th>
-
-                    <td>
-                        {{ profile.get(
-                            'college_name',
-                            ''
-                        ) }}
-                    </td>
-
-                </tr>
-
-
-                <tr>
-
-                    <th>
-                        Department
-                    </th>
-
-                    <td>
-                        {{ profile.get(
-                            'department',
-                            ''
-                        ) }}
-                    </td>
-
-                </tr>
-
-
-                <tr>
-
-                    <th>
-                        Course
-                    </th>
-
-                    <td>
-                        {{ profile.get(
-                            'course',
-                            ''
-                        ) }}
-                    </td>
-
-                </tr>
-
-
-                <tr>
-
-                    <th>
-                        Class
-                    </th>
-
-                    <td>
-                        {{ profile.get(
-                            'class',
-                            ''
-                        ) }}
-                    </td>
-
-                </tr>
-
-
-                <tr>
-
-                    <th>
-                        Semester
-                    </th>
-
-                    <td>
-                        {{ profile.get(
-                            'semester',
-                            ''
-                        ) }}
-                    </td>
-
-                </tr>
-
-
-                <tr>
-
-                    <th>
-                        Academic Year
-                    </th>
-
-                    <td>
-                        {{ profile.get(
-                            'academic_year',
-                            ''
-                        ) }}
-                    </td>
-
-                </tr>
-
-
-                <tr>
-
-                    <th>
-                        Examination
-                    </th>
-
-                    <td>
-                        {{ profile.get(
-                            'examination',
-                            ''
-                        ) }}
-                    </td>
-
-                </tr>
-
-            </table>
-
-
-            <!-- ================================= -->
-            <!-- Profile Settings -->
-            <!-- ================================= -->
-
-            <h2>
-                Profile Settings
-            </h2>
-
-
-            <a
-                href="{{ url_for(
-                    'use_profile',
-                    profile_name=profile_name
-                ) }}"
-            >
-
-                <button type="button">
-                    Use Profile
-                </button>
-
-            </a>
-
-
-            <br><br>
-
-
-            <a
-                href="{{ url_for(
-                    'profile_rules',
-                    profile_name=profile_name
-                ) }}"
-            >
-
-                <button type="button">
-                    Result Rules
-                </button>
-
-            </a>
-
-
-            <br><br>
-
-
-            <a
-                href="{{ url_for(
-                    'profile_design',
-                    profile_name=profile_name
-                ) }}"
-            >
-
-                <button type="button">
-                    PDF Template & Design
-                </button>
-
-            </a>
-
-
-            <br><br>
-
-
-            <a
-                href="{{ url_for(
-                    'delete_profile_route',
-                    profile_name=profile_name
-                ) }}"
-                onclick="
-                    return confirm(
-                        'Are you sure you want to delete this profile?'
-                    );
-                "
-            >
-
-                <button type="button">
-                    Delete Profile
-                </button>
-
-            </a>
-
-
-            <br><br>
-
-
-            <a href="{{ url_for('profiles') }}">
-                Back to Profiles
-            </a>
-
-
-            <br><br>
-
-
-            <a href="{{ url_for('home') }}">
-                Home
-            </a>
-
+            <div class="alert error">
+                {{ error }}
+            </div>
 
         {% endif %}
 
 
-    </div>
+        <!-- ==================================== -->
+        <!-- CREATE NEW PROFILE -->
+        <!-- ==================================== -->
 
+        {% if new_profile %}
+
+            <div class="page-header">
+
+                <h1>
+                    Create New Profile
+                </h1>
+
+                <p>
+                    Create a reusable result profile.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <form
+                    method="POST"
+                    action="{{ url_for('new_profile') }}"
+                >
+
+
+                    <!-- College Name -->
+
+                    <div class="form-group">
+
+                        <label for="college_name">
+                            College Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="college_name"
+                            name="college_name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Department -->
+
+                    <div class="form-group">
+
+                        <label for="department">
+                            Department
+                        </label>
+
+                        <input
+                            type="text"
+                            id="department"
+                            name="department"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Course -->
+
+                    <div class="form-group">
+
+                        <label for="course">
+                            Course
+                        </label>
+
+                        <input
+                            type="text"
+                            id="course"
+                            name="course"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Class -->
+
+                    <div class="form-group">
+
+                        <label for="class">
+                            Class
+                        </label>
+
+                        <input
+                            type="text"
+                            id="class"
+                            name="class"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Semester -->
+
+                    <div class="form-group">
+
+                        <label for="semester">
+                            Semester
+                        </label>
+
+                        <input
+                            type="text"
+                            id="semester"
+                            name="semester"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Academic Year -->
+
+                    <div class="form-group">
+
+                        <label for="academic_year">
+                            Academic Year
+                        </label>
+
+                        <input
+                            type="text"
+                            id="academic_year"
+                            name="academic_year"
+                            placeholder="2026-27"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Examination -->
+
+                    <div class="form-group">
+
+                        <label for="examination">
+                            Examination
+                        </label>
+
+                        <input
+                            type="text"
+                            id="examination"
+                            name="examination"
+                            placeholder="Semester Examination"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Profile Name -->
+
+                    <div class="form-group">
+
+                        <label for="profile_name">
+                            Profile Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="profile_name"
+                            name="profile_name"
+                            placeholder="BSc CS Semester 5"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Buttons -->
+
+                    <div class="button-group">
+
+                        <button
+                            type="submit"
+                            class="button primary"
+                        >
+                            Create Profile
+                        </button>
+
+                        <a
+                            href="{{ url_for('profiles') }}"
+                            class="button"
+                        >
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+        <!-- ==================================== -->
+        <!-- EDIT PROFILE -->
+        <!-- ==================================== -->
+
+        {% elif edit_profile %}
+
+            <div class="page-header">
+
+                <h1>
+                    Edit Profile
+                </h1>
+
+                <p>
+                    Update profile information.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'edit_profile',
+                        profile_name=profile_name
+                    ) }}"
+                >
+
+
+                    <!-- College Name -->
+
+                    <div class="form-group">
+
+                        <label for="college_name">
+                            College Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="college_name"
+                            name="college_name"
+                            value="{{ profile.get('college_name', '') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Department -->
+
+                    <div class="form-group">
+
+                        <label for="department">
+                            Department
+                        </label>
+
+                        <input
+                            type="text"
+                            id="department"
+                            name="department"
+                            value="{{ profile.get('department', '') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Course -->
+
+                    <div class="form-group">
+
+                        <label for="course">
+                            Course
+                        </label>
+
+                        <input
+                            type="text"
+                            id="course"
+                            name="course"
+                            value="{{ profile.get('course', '') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Class -->
+
+                    <div class="form-group">
+
+                        <label for="class">
+                            Class
+                        </label>
+
+                        <input
+                            type="text"
+                            id="class"
+                            name="class"
+                            value="{{ profile.get('class', '') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Semester -->
+
+                    <div class="form-group">
+
+                        <label for="semester">
+                            Semester
+                        </label>
+
+                        <input
+                            type="text"
+                            id="semester"
+                            name="semester"
+                            value="{{ profile.get('semester', '') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Academic Year -->
+
+                    <div class="form-group">
+
+                        <label for="academic_year">
+                            Academic Year
+                        </label>
+
+                        <input
+                            type="text"
+                            id="academic_year"
+                            name="academic_year"
+                            value="{{ profile.get('academic_year', '') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Examination -->
+
+                    <div class="form-group">
+
+                        <label for="examination">
+                            Examination
+                        </label>
+
+                        <input
+                            type="text"
+                            id="examination"
+                            name="examination"
+                            value="{{ profile.get('examination', '') }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Profile Name -->
+
+                    <div class="form-group">
+
+                        <label>
+                            Profile Name
+                        </label>
+
+                        <input
+                            type="text"
+                            value="{{ profile_name }}"
+                            disabled
+                        >
+
+                    </div>
+
+
+                    <!-- Buttons -->
+
+                    <div class="button-group">
+
+                        <button
+                            type="submit"
+                            class="button primary"
+                        >
+                            Save Changes
+                        </button>
+
+                        <a
+                            href="{{ url_for(
+                                'view_profile',
+                                profile_name=profile_name
+                            ) }}"
+                            class="button"
+                        >
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+        <!-- ==================================== -->
+        <!-- VIEW PROFILE -->
+        <!-- ==================================== -->
+
+        {% else %}
+
+            <div class="page-header">
+
+                <h1>
+                    Profile Details
+                </h1>
+
+                <p>
+                    {{ profile_name }}
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <table class="profile-table">
+
+                    <tr>
+
+                        <th>
+                            College Name
+                        </th>
+
+                        <td>
+                            {{ profile.get('college_name', '') }}
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <th>
+                            Department
+                        </th>
+
+                        <td>
+                            {{ profile.get('department', '') }}
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <th>
+                            Course
+                        </th>
+
+                        <td>
+                            {{ profile.get('course', '') }}
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <th>
+                            Class
+                        </th>
+
+                        <td>
+                            {{ profile.get('class', '') }}
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <th>
+                            Semester
+                        </th>
+
+                        <td>
+                            {{ profile.get('semester', '') }}
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <th>
+                            Academic Year
+                        </th>
+
+                        <td>
+                            {{ profile.get('academic_year', '') }}
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <th>
+                            Examination
+                        </th>
+
+                        <td>
+                            {{ profile.get('examination', '') }}
+                        </td>
+
+                    </tr>
+
+                </table>
+
+
+                <!-- ================================= -->
+                <!-- Profile Actions -->
+                <!-- ================================= -->
+
+                <div class="button-group">
+
+
+                    <!-- Edit Profile -->
+
+                    <a
+                        href="{{ url_for(
+                            'edit_profile',
+                            profile_name=profile_name
+                        ) }}"
+                        class="button"
+                    >
+                        Edit Profile
+                    </a>
+
+
+                    <!-- Use Profile -->
+
+                    <a
+                        href="{{ url_for(
+                            'use_profile',
+                            profile_name=profile_name
+                        ) }}"
+                        class="button primary"
+                    >
+                        Use Profile
+                    </a>
+
+
+                    <!-- Result Rules -->
+
+                    <a
+                        href="{{ url_for(
+                            'profile_rules',
+                            profile_name=profile_name
+                        ) }}"
+                        class="button"
+                    >
+                        Result Rules
+                    </a>
+
+
+                    <!-- PDF Design -->
+
+                    <a
+                        href="{{ url_for(
+                            'profile_design',
+                            profile_name=profile_name
+                        ) }}"
+                        class="button"
+                    >
+                        PDF Template & Design
+                    </a>
+
+
+                    <!-- Delete Profile -->
+
+                    <a
+                        href="{{ url_for(
+                            'delete_profile_route',
+                            profile_name=profile_name
+                        ) }}"
+                        class="button danger"
+                        onclick="return confirm(
+                            'Are you sure you want to delete this profile?'
+                        );"
+                    >
+                        Delete Profile
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </main>
+
+
+    <!-- ======================================== -->
+    <!-- Footer -->
+    <!-- ======================================== -->
+
+    <footer>
+
+        <p>
+            Resultra — Smart Results. Simple Generation.
+        </p>
+
+    </footer>
 
 </body>
 

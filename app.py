@@ -39,6 +39,10 @@ from core.pdf_generator import (
 )
 
 
+# ========================================
+# Create Flask Application
+# ========================================
+
 app = Flask(__name__)
 
 
@@ -62,6 +66,10 @@ app.config["MAX_CONTENT_LENGTH"] = (
     config.MAX_CONTENT_LENGTH
 )
 
+
+# ========================================
+# Secret Key
+# ========================================
 
 app.secret_key = "resultra-secret-key"
 
@@ -112,14 +120,12 @@ def upload():
         "selected_profile"
     )
 
-
     if request.method == "GET":
 
         return render_template(
             "upload.html",
             selected_profile=selected_profile
         )
-
 
     if "excel_file" not in request.files:
 
@@ -129,9 +135,7 @@ def upload():
             selected_profile=selected_profile
         )
 
-
     file = request.files["excel_file"]
-
 
     if file.filename == "":
 
@@ -141,7 +145,6 @@ def upload():
             selected_profile=selected_profile
         )
 
-
     if "." not in file.filename:
 
         return render_template(
@@ -150,13 +153,11 @@ def upload():
             selected_profile=selected_profile
         )
 
-
     extension = (
         file.filename
         .rsplit(".", 1)[1]
         .lower()
     )
-
 
     if extension not in config.ALLOWED_EXTENSIONS:
 
@@ -166,15 +167,12 @@ def upload():
             selected_profile=selected_profile
         )
 
-
     file_path = os.path.join(
         config.UPLOAD_FOLDER,
         file.filename
     )
 
-
     file.save(file_path)
-
 
     try:
 
@@ -182,11 +180,9 @@ def upload():
             file_path
         )
 
-
         errors = validate_excel(
             excel_result
         )
-
 
         if errors:
 
@@ -196,23 +192,16 @@ def upload():
                 selected_profile=selected_profile
             )
 
-
         data = excel_result["data"]
 
-
         subjects = [
-
             column
-
             for column in data.columns
-
             if column not in [
                 "Roll No",
                 "Student Name"
             ]
-
         ]
-
 
         session["subjects"] = subjects
 
@@ -224,18 +213,15 @@ def upload():
             file.filename
         )
 
-
         if not selected_profile:
 
             return redirect(
                 url_for("profiles")
             )
 
-
         return redirect(
             url_for("configure_credits")
         )
-
 
     except Exception as error:
 
@@ -263,17 +249,14 @@ def configure_credits():
         "selected_profile"
     )
 
-
     subjects = session.get(
         "subjects",
         []
     )
 
-
     uploaded_file = session.get(
         "uploaded_file"
     )
-
 
     if not subjects:
 
@@ -281,13 +264,11 @@ def configure_credits():
             url_for("upload")
         )
 
-
     if not uploaded_file:
 
         return redirect(
             url_for("upload")
         )
-
 
     if not selected_profile:
 
@@ -295,12 +276,10 @@ def configure_credits():
             url_for("profiles")
         )
 
-
     profile = load_profile(
         config.PROFILE_FOLDER,
         selected_profile
     )
-
 
     if profile is None:
 
@@ -308,18 +287,15 @@ def configure_credits():
             url_for("profiles")
         )
 
-
     rules = profile.get(
         "rules",
         DEFAULT_RULES
     ).copy()
 
-
     subject_credits = rules.get(
         "subject_credits",
         {}
     ).copy()
-
 
     # --------------------------------
     # GET
@@ -334,7 +310,6 @@ def configure_credits():
             subject_credits=subject_credits
         )
 
-
     # --------------------------------
     # POST
     # --------------------------------
@@ -345,16 +320,13 @@ def configure_credits():
         )
     )
 
-
     submitted_credits = (
         request.form.getlist(
             "credit"
         )
     )
 
-
     subject_credits = {}
-
 
     for subject, credit in zip(
         submitted_subjects,
@@ -363,10 +335,8 @@ def configure_credits():
 
         subject = subject.strip()
 
-
         if subject == "":
             continue
-
 
         try:
 
@@ -385,7 +355,6 @@ def configure_credits():
                 )
             )
 
-
         if credit < 0:
 
             return render_template(
@@ -399,9 +368,7 @@ def configure_credits():
                 )
             )
 
-
         subject_credits[subject] = credit
-
 
     for subject in subjects:
 
@@ -418,11 +385,9 @@ def configure_credits():
                 )
             )
 
-
     rules["subject_credits"] = (
         subject_credits
     )
-
 
     save_profile_rules(
         config.PROFILE_FOLDER,
@@ -430,12 +395,10 @@ def configure_credits():
         rules
     )
 
-
     file_path = os.path.join(
         config.UPLOAD_FOLDER,
         uploaded_file
     )
-
 
     try:
 
@@ -443,11 +406,9 @@ def configure_credits():
             file_path
         )
 
-
         errors = validate_excel(
             excel_result
         )
-
 
         if errors:
 
@@ -459,17 +420,13 @@ def configure_credits():
                 errors=errors
             )
 
-
         data = excel_result["data"]
 
-
         student_results = []
-
 
         for _, row in data.iterrows():
 
             student_data = row.to_dict()
-
 
             student_result = (
                 calculate_student_result(
@@ -478,16 +435,13 @@ def configure_credits():
                 )
             )
 
-
             student_results.append(
                 student_result
             )
 
-
         session["student_results"] = (
             student_results
         )
-
 
         return render_template(
             "result.html",
@@ -497,7 +451,6 @@ def configure_credits():
             profile_name=selected_profile,
             preview=True
         )
-
 
     except Exception as error:
 
@@ -524,7 +477,6 @@ def profiles():
         config.PROFILE_FOLDER
     )
 
-
     return render_template(
         "profiles.html",
         profiles=profile_list
@@ -545,7 +497,6 @@ def view_profile(profile_name):
         profile_name
     )
 
-
     if profile is None:
 
         return render_template(
@@ -555,7 +506,6 @@ def view_profile(profile_name):
             ),
             error="Profile not found."
         )
-
 
     return render_template(
         "profile.html",
@@ -578,7 +528,6 @@ def use_profile(profile_name):
         profile_name
     )
 
-
     if profile is None:
 
         return render_template(
@@ -589,11 +538,9 @@ def use_profile(profile_name):
             error="Profile not found."
         )
 
-
     session["selected_profile"] = (
         profile_name
     )
-
 
     return redirect(
         url_for("upload")
@@ -617,12 +564,10 @@ def new_profile():
             new_profile=True
         )
 
-
     profile_name = request.form.get(
         "profile_name",
         ""
     ).strip()
-
 
     if profile_name == "":
 
@@ -632,11 +577,9 @@ def new_profile():
             error="Please enter a profile name."
         )
 
-
     existing_profiles = list_profiles(
         config.PROFILE_FOLDER
     )
-
 
     if profile_name in existing_profiles:
 
@@ -646,61 +589,60 @@ def new_profile():
             error="Profile already exists."
         )
 
-
     profile = {
 
-    "college_name": request.form.get(
-        "college_name",
-        ""
-    ).strip(),
+        "college_name": request.form.get(
+            "college_name",
+            ""
+        ).strip(),
 
-    "department": request.form.get(
-        "department",
-        ""
-    ).strip(),
+        "department": request.form.get(
+            "department",
+            ""
+        ).strip(),
 
-    "course": request.form.get(
-        "course",
-        ""
-    ).strip(),
+        "course": request.form.get(
+            "course",
+            ""
+        ).strip(),
 
-    "class": request.form.get(
-        "class",
-        ""
-    ).strip(),
+        "class": request.form.get(
+            "class",
+            ""
+        ).strip(),
 
-    "semester": request.form.get(
-        "semester",
-        ""
-    ).strip(),
+        "semester": request.form.get(
+            "semester",
+            ""
+        ).strip(),
 
-    "academic_year": request.form.get(
-        "academic_year",
-        ""
-    ).strip(),
+        "academic_year": request.form.get(
+            "academic_year",
+            ""
+        ).strip(),
 
-    "examination": request.form.get(
-        "examination",
-        ""
-    ).strip(),
+        "examination": request.form.get(
+            "examination",
+            ""
+        ).strip(),
 
-    "rules": DEFAULT_RULES,
+        "rules": DEFAULT_RULES,
 
-    "design": {
+        "design": {
 
-        "page_size": "A4",
+            "page_size": "A4",
 
-        "orientation": "portrait",
+            "orientation": "portrait",
 
-        "header_title": "STUDENT RESULT",
+            "header_title": "STUDENT RESULT",
 
-        "header_subtitle": "",
+            "header_subtitle": "",
 
-        "footer_text": "Generated by Resultra"
+            "footer_text": "Generated by Resultra"
+
+        }
 
     }
-
-}
 
     save_profile(
         config.PROFILE_FOLDER,
@@ -708,9 +650,95 @@ def new_profile():
         profile
     )
 
-
     return redirect(
         url_for("profiles")
+    )
+
+
+# ========================================
+# Edit Profile
+# ========================================
+
+@app.route(
+    "/profile/<profile_name>/edit",
+    methods=["GET", "POST"]
+)
+def edit_profile(profile_name):
+
+    profile = load_profile(
+        config.PROFILE_FOLDER,
+        profile_name
+    )
+
+    if profile is None:
+
+        return redirect(
+            url_for("profiles")
+        )
+
+    # --------------------------------
+    # GET
+    # --------------------------------
+
+    if request.method == "GET":
+
+        return render_template(
+            "profile.html",
+            edit_profile=True,
+            profile_name=profile_name,
+            profile=profile
+        )
+
+    # --------------------------------
+    # POST
+    # --------------------------------
+
+    profile["college_name"] = request.form.get(
+        "college_name",
+        ""
+    ).strip()
+
+    profile["department"] = request.form.get(
+        "department",
+        ""
+    ).strip()
+
+    profile["course"] = request.form.get(
+        "course",
+        ""
+    ).strip()
+
+    profile["class"] = request.form.get(
+        "class",
+        ""
+    ).strip()
+
+    profile["semester"] = request.form.get(
+        "semester",
+        ""
+    ).strip()
+
+    profile["academic_year"] = request.form.get(
+        "academic_year",
+        ""
+    ).strip()
+
+    profile["examination"] = request.form.get(
+        "examination",
+        ""
+    ).strip()
+
+    save_profile(
+        config.PROFILE_FOLDER,
+        profile_name,
+        profile
+    )
+
+    return redirect(
+        url_for(
+            "view_profile",
+            profile_name=profile_name
+        )
     )
 
 
@@ -728,7 +756,6 @@ def delete_profile_route(profile_name):
         profile_name
     )
 
-
     if session.get(
         "selected_profile"
     ) == profile_name:
@@ -737,7 +764,6 @@ def delete_profile_route(profile_name):
             "selected_profile",
             None
         )
-
 
     return redirect(
         url_for("profiles")
@@ -759,7 +785,6 @@ def profile_rules(profile_name):
         profile_name
     )
 
-
     if profile is None:
 
         return render_template(
@@ -770,6 +795,9 @@ def profile_rules(profile_name):
             error="Profile not found."
         )
 
+    # --------------------------------
+    # GET
+    # --------------------------------
 
     if request.method == "GET":
 
@@ -778,23 +806,19 @@ def profile_rules(profile_name):
             profile_name
         )
 
-
         if rules is None:
 
             rules = DEFAULT_RULES.copy()
-
 
         detected_subjects = session.get(
             "subjects",
             []
         )
 
-
         subject_credits = rules.get(
             "subject_credits",
             {}
         ).copy()
-
 
         for subject in detected_subjects:
 
@@ -802,11 +826,9 @@ def profile_rules(profile_name):
 
                 subject_credits[subject] = 0
 
-
         rules["subject_credits"] = (
             subject_credits
         )
-
 
         return render_template(
             "rules.html",
@@ -814,18 +836,19 @@ def profile_rules(profile_name):
             rules=rules
         )
 
+    # --------------------------------
+    # POST
+    # --------------------------------
 
     passing_marks = request.form.get(
         "passing_marks",
         type=float
     )
 
-
     max_marks = request.form.get(
         "max_marks_per_subject",
         type=float
     )
-
 
     if (
         passing_marks is None
@@ -839,7 +862,6 @@ def profile_rules(profile_name):
             error="Please enter valid marks."
         )
 
-
     if (
         passing_marks < 0
         or max_marks <= 0
@@ -851,7 +873,6 @@ def profile_rules(profile_name):
             rules=DEFAULT_RULES,
             error="Please enter valid marks."
         )
-
 
     if passing_marks > max_marks:
 
@@ -865,24 +886,19 @@ def profile_rules(profile_name):
             )
         )
 
-
     grade_ranges = []
-
 
     grades = request.form.getlist(
         "grade"
     )
 
-
     minimum_marks = request.form.getlist(
         "min"
     )
 
-
     grade_points = request.form.getlist(
         "grade_point"
     )
-
 
     for grade, minimum, grade_point in zip(
         grades,
@@ -892,7 +908,6 @@ def profile_rules(profile_name):
 
         if grade.strip() == "":
             continue
-
 
         try:
 
@@ -906,14 +921,11 @@ def profile_rules(profile_name):
 
             continue
 
-
         if minimum < 0:
             continue
 
-
         if grade_point < 0:
             continue
-
 
         grade_ranges.append({
 
@@ -925,25 +937,20 @@ def profile_rules(profile_name):
 
         })
 
-
     grade_ranges.sort(
         key=lambda item: item["min"],
         reverse=True
     )
 
-
     subjects = request.form.getlist(
         "subject"
     )
-
 
     credits = request.form.getlist(
         "credit"
     )
 
-
     subject_credits = {}
-
 
     for subject, credit in zip(
         subjects,
@@ -952,10 +959,8 @@ def profile_rules(profile_name):
 
         subject = subject.strip()
 
-
         if subject == "":
             continue
-
 
         try:
 
@@ -965,15 +970,12 @@ def profile_rules(profile_name):
 
             continue
 
-
         if credit < 0:
             continue
-
 
         subject_credits[subject] = (
             credit
         )
-
 
     rules = {
 
@@ -987,13 +989,11 @@ def profile_rules(profile_name):
 
     }
 
-
     save_profile_rules(
         config.PROFILE_FOLDER,
         profile_name,
         rules
     )
-
 
     return render_template(
         "rules.html",
@@ -1020,7 +1020,6 @@ def profile_design(profile_name):
         profile_name
     )
 
-
     if profile is None:
 
         return render_template(
@@ -1031,12 +1030,14 @@ def profile_design(profile_name):
             error="Profile not found."
         )
 
-
     design = profile.get(
         "design",
         {}
     ).copy()
 
+    # --------------------------------
+    # GET
+    # --------------------------------
 
     if request.method == "GET":
 
@@ -1046,36 +1047,34 @@ def profile_design(profile_name):
             design=design
         )
 
+    # --------------------------------
+    # POST
+    # --------------------------------
 
     page_size = request.form.get(
         "page_size",
         "A4"
     )
 
-
     orientation = request.form.get(
         "orientation",
         "portrait"
     )
-
 
     header_title = request.form.get(
         "header_title",
         ""
     ).strip()
 
-
     header_subtitle = request.form.get(
         "header_subtitle",
         ""
     ).strip()
 
-
     footer_text = request.form.get(
         "footer_text",
         ""
     ).strip()
-
 
     if page_size not in [
         "A4",
@@ -1084,14 +1083,12 @@ def profile_design(profile_name):
 
         page_size = "A4"
 
-
     if orientation not in [
         "portrait",
         "landscape"
     ]:
 
         orientation = "portrait"
-
 
     design = {
 
@@ -1107,16 +1104,13 @@ def profile_design(profile_name):
 
     }
 
-
     profile["design"] = design
-
 
     save_profile(
         config.PROFILE_FOLDER,
         profile_name,
         profile
     )
-
 
     return render_template(
         "design.html",
@@ -1143,11 +1137,9 @@ def generate_pdf(roll_no):
         []
     )
 
-
     profile_name = session.get(
         "selected_profile"
     )
-
 
     if not profile_name:
 
@@ -1155,12 +1147,10 @@ def generate_pdf(roll_no):
             url_for("profiles")
         )
 
-
     profile = load_profile(
         config.PROFILE_FOLDER,
         profile_name
     )
-
 
     if profile is None:
 
@@ -1168,9 +1158,7 @@ def generate_pdf(roll_no):
             url_for("profiles")
         )
 
-
     student_result = None
-
 
     for result in student_results:
 
@@ -1182,31 +1170,26 @@ def generate_pdf(roll_no):
 
             break
 
-
     if student_result is None:
 
         return redirect(
             url_for("home")
         )
 
-
     file_name = (
         f"{roll_no}_result.pdf"
     )
-
 
     output_path = os.path.join(
         config.GENERATED_FOLDER,
         file_name
     )
 
-
     generate_student_pdf(
         student_result,
         profile,
         output_path
     )
-
 
     return redirect(
         url_for(
@@ -1246,11 +1229,9 @@ def preview_pdf(roll_no):
         []
     )
 
-
     profile_name = session.get(
         "selected_profile"
     )
-
 
     if not profile_name:
 
@@ -1258,12 +1239,10 @@ def preview_pdf(roll_no):
             url_for("profiles")
         )
 
-
     profile = load_profile(
         config.PROFILE_FOLDER,
         profile_name
     )
-
 
     if profile is None:
 
@@ -1271,9 +1250,7 @@ def preview_pdf(roll_no):
             url_for("profiles")
         )
 
-
     student_result = None
-
 
     for result in student_results:
 
@@ -1285,31 +1262,26 @@ def preview_pdf(roll_no):
 
             break
 
-
     if student_result is None:
 
         return redirect(
             url_for("home")
         )
 
-
     file_name = (
         f"{roll_no}_preview.pdf"
     )
-
 
     output_path = os.path.join(
         config.GENERATED_FOLDER,
         file_name
     )
 
-
     generate_student_pdf(
         student_result,
         profile,
         output_path
     )
-
 
     return send_from_directory(
         config.GENERATED_FOLDER,
@@ -1333,11 +1305,9 @@ def generate_all_pdfs():
         []
     )
 
-
     profile_name = session.get(
         "selected_profile"
     )
-
 
     if not profile_name:
 
@@ -1345,12 +1315,10 @@ def generate_all_pdfs():
             url_for("profiles")
         )
 
-
     profile = load_profile(
         config.PROFILE_FOLDER,
         profile_name
     )
-
 
     if profile is None:
 
@@ -1358,9 +1326,7 @@ def generate_all_pdfs():
             url_for("profiles")
         )
 
-
     generated_files = []
-
 
     for student_result in student_results:
 
@@ -1368,17 +1334,14 @@ def generate_all_pdfs():
             "Roll No"
         ]
 
-
         file_name = (
             f"{roll_no}_result.pdf"
         )
-
 
         output_path = os.path.join(
             config.GENERATED_FOLDER,
             file_name
         )
-
 
         generate_student_pdf(
             student_result,
@@ -1386,11 +1349,9 @@ def generate_all_pdfs():
             output_path
         )
 
-
         generated_files.append(
             file_name
         )
-
 
     return render_template(
         "result.html",
@@ -1419,11 +1380,9 @@ def download_all_pdfs():
         []
     )
 
-
     profile_name = session.get(
         "selected_profile"
     )
-
 
     if not student_results:
 
@@ -1431,19 +1390,16 @@ def download_all_pdfs():
             url_for("home")
         )
 
-
     if not profile_name:
 
         return redirect(
             url_for("profiles")
         )
 
-
     profile = load_profile(
         config.PROFILE_FOLDER,
         profile_name
     )
-
 
     if profile is None:
 
@@ -1451,17 +1407,14 @@ def download_all_pdfs():
             url_for("profiles")
         )
 
-
     zip_file_name = (
         f"{profile_name}_results.zip"
     )
-
 
     zip_path = os.path.join(
         config.GENERATED_FOLDER,
         zip_file_name
     )
-
 
     # --------------------------------
     # Generate PDFs and create ZIP
@@ -1473,24 +1426,20 @@ def download_all_pdfs():
         zipfile.ZIP_DEFLATED
     ) as zip_file:
 
-
         for student_result in student_results:
 
             roll_no = student_result[
                 "Roll No"
             ]
 
-
             pdf_file_name = (
                 f"{roll_no}_result.pdf"
             )
-
 
             pdf_path = os.path.join(
                 config.GENERATED_FOLDER,
                 pdf_file_name
             )
-
 
             generate_student_pdf(
                 student_result,
@@ -1498,12 +1447,10 @@ def download_all_pdfs():
                 pdf_path
             )
 
-
             zip_file.write(
                 pdf_path,
                 arcname=pdf_file_name
             )
-
 
     return send_file(
         zip_path,
