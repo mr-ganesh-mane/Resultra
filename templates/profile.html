@@ -5,10 +5,7 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Profile - Resultra</title>
 
@@ -19,251 +16,269 @@
 
 </head>
 
+
 <body>
 
+    <div class="container">
 
-{% if profile %}
+        <!-- Page Heading -->
 
-    <h1>
-        {{ profile_name }}
-    </h1>
-
-    <p>
-        Saved Result Profile
-    </p>
+        <h1>Profile</h1>
 
 
-    <h2>Profile Information</h2>
+        <!-- Success Message -->
 
+        {% if success %}
 
-    <table border="1" cellpadding="8">
-
-        <tr>
-            <th>Department</th>
-            <td>{{ profile.department }}</td>
-        </tr>
-
-        <tr>
-            <th>Course</th>
-            <td>{{ profile.course }}</td>
-        </tr>
-
-        <tr>
-            <th>Class</th>
-            <td>{{ profile.class }}</td>
-        </tr>
-
-        <tr>
-            <th>Semester</th>
-            <td>{{ profile.semester }}</td>
-        </tr>
-
-        <tr>
-            <th>Academic Year</th>
-            <td>{{ profile.academic_year }}</td>
-        </tr>
-
-        <tr>
-            <th>Examination</th>
-            <td>{{ profile.examination }}</td>
-        </tr>
-
-    </table>
-
-
-    <br>
-
-
-    <h2>Result Rules</h2>
-
-    <p>
-        Passing Marks:
-        <strong>
-            {{ profile.rules.passing_marks }}
-        </strong>
-    </p>
-
-
-    <h2>PDF Design</h2>
-
-    <p>
-        Page Size:
-        {{ profile.design.page_size }}
-    </p>
-
-    <p>
-        Orientation:
-        {{ profile.design.orientation }}
-    </p>
-
-
-    <br>
-
-
-    <a href="{{ url_for('use_profile', profile_name=profile_name) }}">
-        Use This Profile for Results
-    </a>
-
-
-    <br>
-    <br>
-
-
-    <a href="{{ url_for('profiles') }}">
-        Back to Profiles
-    </a>
-
-
-{% else %}
-
-    <h1>Create Result Profile</h1>
-
-
-    {% if error %}
-
-        <p>
-            {{ error }}
-        </p>
-
-    {% endif %}
-
-
-    {% if success %}
-
-        <p>
+        <div class="success">
             {{ success }}
-        </p>
+        </div>
 
-    {% endif %}
+        {% endif %}
 
 
-    <form
-        action="{{ url_for('new_profile') }}"
-        method="POST"
-    >
+        <!-- Error Message -->
 
-        <label>
-            Profile Name:
-        </label>
+        {% if error %}
+
+        <div class="error">
+            {{ error }}
+        </div>
+
+        {% endif %}
+
+
+        {% if profile %}
+
+        <!-- ==========================================
+             Existing Profile
+             ========================================== -->
+
+        <h2>{{ profile_name }}</h2>
+
+
+        <table border="1">
+
+            <tr>
+                <th>Department</th>
+                <td>{{ profile.get("department", "") }}</td>
+            </tr>
+
+            <tr>
+                <th>Course</th>
+                <td>{{ profile.get("course", "") }}</td>
+            </tr>
+
+            <tr>
+                <th>Class</th>
+                <td>{{ profile.get("class", "") }}</td>
+            </tr>
+
+            <tr>
+                <th>Semester</th>
+                <td>{{ profile.get("semester", "") }}</td>
+            </tr>
+
+            <tr>
+                <th>Academic Year</th>
+                <td>{{ profile.get("academic_year", "") }}</td>
+            </tr>
+
+            <tr>
+                <th>Examination</th>
+                <td>{{ profile.get("examination", "") }}</td>
+            </tr>
+
+        </table>
+
 
         <br>
 
-        <input
-            type="text"
-            name="profile_name"
-            required
+
+        <!-- Result Rules Button -->
+
+        <a
+            href="{{ url_for('profile_rules', profile_name=profile_name) }}"
+        >
+            <button type="button">
+                Configure Result Rules
+            </button>
+        </a>
+
+
+        <br><br>
+
+
+        <!-- Use Profile Button -->
+
+        <a
+            href="{{ url_for('use_profile', profile_name=profile_name) }}"
+        >
+            <button type="button">
+                Use This Profile
+            </button>
+        </a>
+
+
+        <br><br>
+
+
+        <a href="{{ url_for('profiles') }}">
+            Back to Profiles
+        </a>
+
+
+        <br><br>
+
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+
+        {% else %}
+
+        <!-- ==========================================
+             Create New Profile
+             ========================================== -->
+
+        <h2>Create New Profile</h2>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('new_profile') }}"
         >
 
+            <!-- Profile Name -->
+
+            <label for="profile_name">
+                Profile Name
+            </label>
+
+            <input
+                type="text"
+                id="profile_name"
+                name="profile_name"
+                placeholder="Example: TY BSc CS 2026"
+                required
+            >
+
+
+            <!-- Department -->
+
+            <label for="department">
+                Department
+            </label>
+
+            <input
+                type="text"
+                id="department"
+                name="department"
+                placeholder="Example: Computer Science"
+            >
+
+
+            <!-- Course -->
+
+            <label for="course">
+                Course
+            </label>
+
+            <input
+                type="text"
+                id="course"
+                name="course"
+                placeholder="Example: B.Sc. Computer Science"
+            >
+
+
+            <!-- Class -->
+
+            <label for="class">
+                Class
+            </label>
+
+            <input
+                type="text"
+                id="class"
+                name="class"
+                placeholder="Example: T.Y.B.Sc. CS"
+            >
+
+
+            <!-- Semester -->
+
+            <label for="semester">
+                Semester
+            </label>
+
+            <input
+                type="text"
+                id="semester"
+                name="semester"
+                placeholder="Example: Semester VI"
+            >
+
+
+            <!-- Academic Year -->
+
+            <label for="academic_year">
+                Academic Year
+            </label>
+
+            <input
+                type="text"
+                id="academic_year"
+                name="academic_year"
+                placeholder="Example: 2025-26"
+            >
+
+
+            <!-- Examination -->
+
+            <label for="examination">
+                Examination
+            </label>
+
+            <input
+                type="text"
+                id="examination"
+                name="examination"
+                placeholder="Example: University Examination"
+            >
+
+
+            <br>
+
+
+            <!-- Save Profile -->
+
+            <button type="submit">
+                Save Profile
+            </button>
+
+        </form>
+
+
         <br>
-        <br>
 
 
-        <label>
-            Department:
-        </label>
-
-        <br>
-
-        <input
-            type="text"
-            name="department"
-        >
-
-        <br>
-        <br>
+        <a href="{{ url_for('profiles') }}">
+            Back to Profiles
+        </a>
 
 
-        <label>
-            Course:
-        </label>
-
-        <br>
-
-        <input
-            type="text"
-            name="course"
-        >
-
-        <br>
-        <br>
+        <br><br>
 
 
-        <label>
-            Class:
-        </label>
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
 
-        <br>
+        {% endif %}
 
-        <input
-            type="text"
-            name="class"
-        >
-
-        <br>
-        <br>
-
-
-        <label>
-            Semester:
-        </label>
-
-        <br>
-
-        <input
-            type="text"
-            name="semester"
-        >
-
-        <br>
-        <br>
-
-
-        <label>
-            Academic Year:
-        </label>
-
-        <br>
-
-        <input
-            type="text"
-            name="academic_year"
-        >
-
-        <br>
-        <br>
-
-
-        <label>
-            Examination:
-        </label>
-
-        <br>
-
-        <input
-            type="text"
-            name="examination"
-        >
-
-        <br>
-        <br>
-
-
-        <button type="submit">
-            Save Profile
-        </button>
-
-    </form>
-
-
-    <br>
-
-
-    <a href="{{ url_for('profiles') }}">
-        View Profiles
-    </a>
-
-{% endif %}
-
+    </div>
 
 </body>
 

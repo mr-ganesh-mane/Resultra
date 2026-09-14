@@ -19,10 +19,22 @@ def save_profile(profile_folder, profile_name, profile_data):
 
     os.makedirs(profile_folder, exist_ok=True)
 
-    file_path = get_profile_path(profile_folder, profile_name)
+    file_path = get_profile_path(
+        profile_folder,
+        profile_name
+    )
 
-    with open(file_path, "w", encoding="utf-8") as file:
-        json.dump(profile_data, file, indent=4)
+    with open(
+        file_path,
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            profile_data,
+            file,
+            indent=4
+        )
 
     return file_path
 
@@ -32,12 +44,20 @@ def load_profile(profile_folder, profile_name):
     Load a saved profile.
     """
 
-    file_path = get_profile_path(profile_folder, profile_name)
+    file_path = get_profile_path(
+        profile_folder,
+        profile_name
+    )
 
     if not os.path.exists(file_path):
         return None
 
-    with open(file_path, "r", encoding="utf-8") as file:
+    with open(
+        file_path,
+        "r",
+        encoding="utf-8"
+    ) as file:
+
         return json.load(file)
 
 
@@ -54,8 +74,14 @@ def list_profiles(profile_folder):
     for file_name in os.listdir(profile_folder):
 
         if file_name.endswith(".json"):
+
             profile_name = file_name[:-5]
-            profile_name = profile_name.replace("_", " ")
+
+            profile_name = profile_name.replace(
+                "_",
+                " "
+            )
+
             profiles.append(profile_name)
 
     return profiles
@@ -66,10 +92,55 @@ def delete_profile(profile_folder, profile_name):
     Delete a saved profile.
     """
 
-    file_path = get_profile_path(profile_folder, profile_name)
+    file_path = get_profile_path(
+        profile_folder,
+        profile_name
+    )
 
     if os.path.exists(file_path):
+
         os.remove(file_path)
+
         return True
 
     return False
+
+
+def save_profile_rules(profile_folder, profile_name, rules):
+    """
+    Save result rules inside an existing profile.
+    """
+
+    profile = load_profile(
+        profile_folder,
+        profile_name
+    )
+
+    if profile is None:
+        return False
+
+    profile["rules"] = rules
+
+    save_profile(
+        profile_folder,
+        profile_name,
+        profile
+    )
+
+    return True
+
+
+def load_profile_rules(profile_folder, profile_name):
+    """
+    Load result rules from a profile.
+    """
+
+    profile = load_profile(
+        profile_folder,
+        profile_name
+    )
+
+    if profile is None:
+        return None
+
+    return profile.get("rules")

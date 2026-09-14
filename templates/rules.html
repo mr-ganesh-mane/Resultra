@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Result Rules - Resultra</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <!-- Page Header -->
+
+        <h1>Result Rules</h1>
+
+        <p>
+            Configure result rules for profile:
+            <strong>{{ profile_name }}</strong>
+        </p>
+
+
+        <!-- Success Message -->
+
+        {% if success %}
+
+        <div class="success">
+
+            {{ success }}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- Error Message -->
+
+        {% if error %}
+
+        <div class="error">
+
+            {{ error }}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- Rules Form -->
+
+        <form
+            method="POST"
+            action="{{ url_for('profile_rules', profile_name=profile_name) }}"
+        >
+
+            <!-- Basic Rules -->
+
+            <h2>Basic Rules</h2>
+
+
+            <label for="passing_marks">
+                Passing Marks
+            </label>
+
+            <input
+                type="number"
+                id="passing_marks"
+                name="passing_marks"
+                value="{{ rules.get('passing_marks', 40) }}"
+                min="0"
+                step="1"
+                required
+            >
+
+
+            <label for="max_marks_per_subject">
+                Maximum Marks Per Subject
+            </label>
+
+            <input
+                type="number"
+                id="max_marks_per_subject"
+                name="max_marks_per_subject"
+                value="{{ rules.get('max_marks_per_subject', 100) }}"
+                min="1"
+                step="1"
+                required
+            >
+
+
+            <!-- Grade Rules -->
+
+            <h2>Grade Ranges</h2>
+
+            <p>
+                Enter the minimum marks required for each grade.
+            </p>
+
+
+            <table border="1">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Minimum Marks</th>
+
+                        <th>Grade</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for grade_rule in rules.get('grade_ranges', []) %}
+
+                    <tr>
+
+                        <td>
+
+                            <input
+                                type="number"
+                                name="min"
+                                value="{{ grade_rule.get('min', 0) }}"
+                                min="0"
+                                step="1"
+                                required
+                            >
+
+                        </td>
+
+
+                        <td>
+
+                            <input
+                                type="text"
+                                name="grade"
+                                value="{{ grade_rule.get('grade', '') }}"
+                                maxlength="10"
+                                required
+                            >
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+
+            <!-- Buttons -->
+
+            <br>
+
+            <button type="submit">
+                Save Rules
+            </button>
+
+        </form>
+
+
+        <!-- Navigation -->
+
+        <br>
+
+        <a
+            href="{{ url_for('view_profile', profile_name=profile_name) }}"
+        >
+            Back to Profile
+        </a>
+
+        <br><br>
+
+        <a href="{{ url_for('profiles') }}">
+            Back to Profiles
+        </a>
+
+        <br><br>
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+    </div>
+
+</body>
+
+</html>

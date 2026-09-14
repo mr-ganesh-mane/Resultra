@@ -1,4 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_file
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+    send_file
+)
 
 import config
 import os
@@ -13,7 +21,9 @@ from core.profile_manager import (
     save_profile,
     load_profile,
     list_profiles,
-    delete_profile
+    delete_profile,
+    save_profile_rules,
+    load_profile_rules
 )
 
 
@@ -253,6 +263,183 @@ def view_profile(profile_name):
 
 
 # --------------------------------------------------
+# Result Rules
+# --------------------------------------------------
+
+@app.route(
+    "/profile/<profile_name>/rules",
+    methods=["GET", "POST"]
+)
+def profile_rules(profile_name):
+
+    profile = load_profile(
+        config.PROFILE_FOLDER,
+        profile_name
+    )
+
+    if profile is None:
+
+        return render_template(
+            "profiles.html",
+            profiles=list_profiles(
+                config.PROFILE_FOLDER
+            ),
+            error="Profile not found."
+        )
+
+
+    # ------------------------------------------
+    # Show Rules
+    # ------------------------------------------
+
+    if request.method == "GET":
+
+        rules = load_profile_rules(
+            config.PROFILE_FOLDER,
+            profile_name
+        )
+
+        if rules is None:
+
+            rules = DEFAULT_RULES
+
+        return render_template(
+            "rules.html",
+            profile_name=profile_name,
+            rules=rules
+        )
+
+
+    # ------------------------------------------
+    # Get Passing Marks
+    # ------------------------------------------
+
+    passing_marks = request.form.get(
+        "passing_marks",
+        type=float
+    )
+
+    max_marks = request.form.get(
+        "max_marks_per_subject",
+        type=float
+    )
+
+
+    # ------------------------------------------
+    # Validate Marks
+    # ------------------------------------------
+
+    if passing_marks is None or max_marks is None:
+
+        return render_template(
+            "rules.html",
+            profile_name=profile_name,
+            rules=DEFAULT_RULES,
+            error="Please enter valid marks."
+        )
+
+
+    if passing_marks < 0 or max_marks <= 0:
+
+        return render_template(
+            "rules.html",
+            profile_name=profile_name,
+            rules=DEFAULT_RULES,
+            error="Please enter valid marks."
+        )
+
+
+    if passing_marks > max_marks:
+
+        return render_template(
+            "rules.html",
+            profile_name=profile_name,
+            rules=DEFAULT_RULES,
+            error=(
+                "Passing marks cannot be greater "
+                "than maximum marks."
+            )
+        )
+
+
+    # ------------------------------------------
+    # Grade Ranges
+    # ------------------------------------------
+
+    grade_ranges = []
+
+    grades = request.form.getlist("grade")
+
+    minimum_marks = request.form.getlist("min")
+
+
+    for grade, minimum in zip(
+        grades,
+        minimum_marks
+    ):
+
+        if grade.strip() == "":
+            continue
+
+        try:
+
+            minimum = float(minimum)
+
+        except ValueError:
+
+            continue
+
+        grade_ranges.append({
+            "min": minimum,
+            "grade": grade.strip()
+        })
+
+
+    # ------------------------------------------
+    # Sort Grade Ranges
+    # ------------------------------------------
+
+    grade_ranges.sort(
+        key=lambda item: item["min"],
+        reverse=True
+    )
+
+
+    # ------------------------------------------
+    # Create Rules
+    # ------------------------------------------
+
+    rules = {
+        "passing_marks": passing_marks,
+        "max_marks_per_subject": max_marks,
+        "grade_ranges": grade_ranges
+    }
+
+
+    # ------------------------------------------
+    # Save Rules
+    # ------------------------------------------
+
+    save_profile_rules(
+        config.PROFILE_FOLDER,
+        profile_name,
+        rules
+    )
+
+
+    # ------------------------------------------
+    # Show Success
+    # ------------------------------------------
+
+    return render_template(
+        "rules.html",
+        profile_name=profile_name,
+        rules=rules,
+        success="Result rules saved successfully."
+    )
+
+
+# --------------------------------------------------
 # Use Profile
 # --------------------------------------------------
 
@@ -299,9 +486,11 @@ def new_profile():
             "profile.html"
         )
 
+
     profile_name = request.form.get(
         "profile_name"
     )
+
 
     if not profile_name:
 
@@ -309,6 +498,7 @@ def new_profile():
             "profile.html",
             error="Profile name is required."
         )
+
 
     profile = {
 
@@ -354,11 +544,13 @@ def new_profile():
 
     }
 
+
     save_profile(
         config.PROFILE_FOLDER,
         profile_name,
         profile
     )
+
 
     return render_template(
         "profile.html",
@@ -377,6 +569,7 @@ def generate_pdf(student_index):
         "selected_profile"
     )
 
+
     if not selected_profile_name:
 
         return render_template(
@@ -385,12 +578,15 @@ def generate_pdf(student_index):
         )
 
 
+    # ------------------------------------------
     # Load Profile
+    # ------------------------------------------
 
     profile = load_profile(
         config.PROFILE_FOLDER,
         selected_profile_name
     )
+
 
     if profile is None:
 
@@ -400,11 +596,14 @@ def generate_pdf(student_index):
         )
 
 
+    # ------------------------------------------
     # Get Student Results
+    # ------------------------------------------
 
     student_results = session.get(
         "student_results"
     )
+
 
     if not student_results:
 
@@ -417,9 +616,14 @@ def generate_pdf(student_index):
         )
 
 
+    # ------------------------------------------
     # Check Student Index
+    # ------------------------------------------
 
-    if student_index < 0 or student_index >= len(student_results):
+    if (
+        student_index < 0
+        or student_index >= len(student_results)
+    ):
 
         return render_template(
             "upload.html",
@@ -427,14 +631,18 @@ def generate_pdf(student_index):
         )
 
 
+    # ------------------------------------------
     # Get Student Result
+    # ------------------------------------------
 
     student_result = student_results[
         student_index
     ]
 
 
+    # ------------------------------------------
     # Create File Name
+    # ------------------------------------------
 
     file_name = (
         str(student_result["Roll No"])
@@ -449,7 +657,9 @@ def generate_pdf(student_index):
     )
 
 
+    # ------------------------------------------
     # Create File Path
+    # ------------------------------------------
 
     output_path = (
         config.GENERATED_FOLDER
@@ -458,7 +668,9 @@ def generate_pdf(student_index):
     )
 
 
+    # ------------------------------------------
     # Generate PDF
+    # ------------------------------------------
 
     generate_student_pdf(
         student_result,
@@ -467,7 +679,9 @@ def generate_pdf(student_index):
     )
 
 
+    # ------------------------------------------
     # Redirect to PDF Preview
+    # ------------------------------------------
 
     return redirect(
         url_for(
@@ -490,12 +704,14 @@ def download_pdf(filename):
         + filename
     )
 
+
     if not os.path.exists(file_path):
 
         return render_template(
             "upload.html",
             error="PDF file not found."
         )
+
 
     return send_file(
         file_path,
@@ -516,12 +732,14 @@ def preview_pdf(filename):
         + filename
     )
 
+
     if not os.path.exists(file_path):
 
         return render_template(
             "upload.html",
             error="PDF file not found."
         )
+
 
     return send_file(
         file_path,
@@ -541,6 +759,7 @@ def generate_all_pdfs():
         "selected_profile"
     )
 
+
     if not selected_profile_name:
 
         return render_template(
@@ -549,12 +768,15 @@ def generate_all_pdfs():
         )
 
 
+    # ------------------------------------------
     # Load Profile
+    # ------------------------------------------
 
     profile = load_profile(
         config.PROFILE_FOLDER,
         selected_profile_name
     )
+
 
     if profile is None:
 
@@ -564,11 +786,14 @@ def generate_all_pdfs():
         )
 
 
+    # ------------------------------------------
     # Get Student Results
+    # ------------------------------------------
 
     student_results = session.get(
         "student_results"
     )
+
 
     if not student_results:
 
@@ -581,9 +806,12 @@ def generate_all_pdfs():
         )
 
 
+    # ------------------------------------------
     # Generate All PDFs
+    # ------------------------------------------
 
     generated_files = []
+
 
     for student_result in student_results:
 
@@ -599,11 +827,13 @@ def generate_all_pdfs():
             + ".pdf"
         )
 
+
         output_path = (
             config.GENERATED_FOLDER
             + "/"
             + file_name
         )
+
 
         generate_student_pdf(
             student_result,
@@ -611,12 +841,15 @@ def generate_all_pdfs():
             output_path
         )
 
+
         generated_files.append(
             file_name
         )
 
 
+    # ------------------------------------------
     # Show Results
+    # ------------------------------------------
 
     return render_template(
         "result.html",
