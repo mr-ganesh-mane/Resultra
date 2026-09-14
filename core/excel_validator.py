@@ -2,137 +2,261 @@ import pandas as pd
 
 
 def validate_single_sheet(data):
-    """
-    Validate Excel data where all subjects are
-    present in one sheet.
-    """
 
     errors = []
 
-    required_columns = ["Roll No", "Student Name"]
-
-    # Check required columns
-    for column in required_columns:
-        if column not in data.columns:
-            errors.append(f"Missing required column: {column}")
-
-    if errors:
-        return errors
-
-    # Check empty Roll No
-    if data["Roll No"].isnull().any():
-        errors.append("Roll No contains empty values.")
-
-    # Check empty Student Name
-    if data["Student Name"].isnull().any():
-        errors.append("Student Name contains empty values.")
-
-    # Check duplicate Roll No
-    if data["Roll No"].duplicated().any():
-        errors.append("Duplicate Roll No found.")
-
-    # Identify subject columns
-    subject_columns = [
-        column for column in data.columns
-        if column not in ["Roll No", "Student Name"]
+    required_columns = [
+        "Roll No",
+        "Student Name"
     ]
 
-    if not subject_columns:
-        errors.append("No subject columns found.")
+
+    # ------------------------------------------
+    # Required Columns
+    # ------------------------------------------
+
+    for column in required_columns:
+
+        if column not in data.columns:
+
+            errors.append(
+                f"Missing required column: {column}"
+            )
+
+
+    if errors:
+
         return errors
 
-    # Check marks
+
+    # ------------------------------------------
+    # Roll No Validation
+    # ------------------------------------------
+
+    if data["Roll No"].isnull().any():
+
+        errors.append(
+            "Roll No contains empty values."
+        )
+
+
+    if data["Student Name"].isnull().any():
+
+        errors.append(
+            "Student Name contains empty values."
+        )
+
+
+    if data["Roll No"].duplicated().any():
+
+        errors.append(
+            "Duplicate Roll No found."
+        )
+
+
+    # ------------------------------------------
+    # Subject Validation
+    # ------------------------------------------
+
+    subject_columns = [
+        column
+        for column in data.columns
+        if column not in [
+            "Roll No",
+            "Student Name"
+        ]
+    ]
+
+
+    if not subject_columns:
+
+        errors.append(
+            "No subject columns found."
+        )
+
+        return errors
+
+
     for subject in subject_columns:
 
         if data[subject].isnull().any():
-            errors.append(f"Empty marks found in subject: {subject}")
 
-        numeric_marks = pd.to_numeric(data[subject], errors="coerce")
+            errors.append(
+                f"Empty marks found in subject: {subject}"
+            )
+
+
+        numeric_marks = pd.to_numeric(
+            data[subject],
+            errors="coerce"
+        )
+
 
         if numeric_marks.isnull().any():
-            errors.append(f"Invalid marks found in subject: {subject}")
+
+            errors.append(
+                f"Invalid marks found in subject: {subject}"
+            )
+
 
         if (numeric_marks < 0).any():
-            errors.append(f"Negative marks found in subject: {subject}")
+
+            errors.append(
+                f"Negative marks found in subject: {subject}"
+            )
+
 
     return errors
 
 
 def validate_subject_wise(subject_data):
-    """
-    Validate Excel data where each subject
-    has a separate worksheet.
-    """
 
     errors = []
 
+
+    # ------------------------------------------
+    # Check Subject Sheets
+    # ------------------------------------------
+
     if not subject_data:
-        errors.append("No subject sheets found.")
+
+        errors.append(
+            "No subject sheets found."
+        )
+
         return errors
+
+
+    # ------------------------------------------
+    # Validate Each Subject
+    # ------------------------------------------
 
     for subject, data in subject_data.items():
 
-        required_columns = ["Roll No", "Student Name", "Marks"]
+        required_columns = [
+            "Roll No",
+            "Student Name",
+            "Marks"
+        ]
 
-        # Check required columns
+
+        # --------------------------------------
+        # Required Columns
+        # --------------------------------------
+
         for column in required_columns:
+
             if column not in data.columns:
+
                 errors.append(
-                    f"Missing column '{column}' in subject '{subject}'."
+                    f"Missing column '{column}' "
+                    f"in subject '{subject}'."
                 )
 
-        if not all(column in data.columns for column in required_columns):
+
+        if not all(
+            column in data.columns
+            for column in required_columns
+        ):
+
             continue
 
-        # Check empty Roll No
+
+        # --------------------------------------
+        # Roll No
+        # --------------------------------------
+
         if data["Roll No"].isnull().any():
+
             errors.append(
-                f"Empty Roll No found in subject '{subject}'."
+                f"Empty Roll No found "
+                f"in subject '{subject}'."
             )
 
-        # Check duplicate Roll No
+
         if data["Roll No"].duplicated().any():
+
             errors.append(
-                f"Duplicate Roll No found in subject '{subject}'."
+                f"Duplicate Roll No found "
+                f"in subject '{subject}'."
             )
 
-        # Check empty Student Name
+
+        # --------------------------------------
+        # Student Name
+        # --------------------------------------
+
         if data["Student Name"].isnull().any():
+
             errors.append(
-                f"Empty Student Name found in subject '{subject}'."
+                f"Empty Student Name found "
+                f"in subject '{subject}'."
             )
 
-        # Check marks
+
+        # --------------------------------------
+        # Marks
+        # --------------------------------------
+
         numeric_marks = pd.to_numeric(
             data["Marks"],
             errors="coerce"
         )
 
+
         if numeric_marks.isnull().any():
+
             errors.append(
-                f"Invalid marks found in subject '{subject}'."
+                f"Invalid marks found "
+                f"in subject '{subject}'."
             )
 
+
         if (numeric_marks < 0).any():
+
             errors.append(
-                f"Negative marks found in subject '{subject}'."
+                f"Negative marks found "
+                f"in subject '{subject}'."
             )
+
 
     return errors
 
 
 def validate_excel(result):
-    """
-    Validate data returned by excel_reader.py.
-    """
 
     excel_format = result["format"]
-    data = result["data"]
+
+
+    # ------------------------------------------
+    # Single Sheet
+    # ------------------------------------------
 
     if excel_format == "single_sheet":
-        return validate_single_sheet(data)
+
+        data = result["data"]
+
+        return validate_single_sheet(
+            data
+        )
+
+
+    # ------------------------------------------
+    # Subject Wise
+    # ------------------------------------------
 
     if excel_format == "subject_wise":
-        return validate_subject_wise(data)
 
-    return ["Unknown Excel format."]
+        # Use original subject sheets
+        raw_data = result.get(
+            "raw_data"
+        )
+
+        return validate_subject_wise(
+            raw_data
+        )
+
+
+    return [
+        "Unknown Excel format."
+    ]

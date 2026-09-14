@@ -81,10 +81,14 @@ def upload():
             selected_profile=selected_profile
         )
 
-    file_path = (
-        config.UPLOAD_FOLDER
-        + "/"
-        + file.filename
+    file_path = os.path.join(
+        config.UPLOAD_FOLDER,
+        file.filename
+    )
+
+    os.makedirs(
+        config.UPLOAD_FOLDER,
+        exist_ok=True
     )
 
     file.save(file_path)
@@ -118,20 +122,8 @@ def upload():
 
 
         # ------------------------------------------
-        # Check Excel Format
+        # Get Excel Data
         # ------------------------------------------
-
-        if excel_result["format"] != "single_sheet":
-
-            return render_template(
-                "upload.html",
-                error=(
-                    "Subject-wise Excel format "
-                    "will be added next."
-                ),
-                selected_profile=selected_profile
-            )
-
 
         data = excel_result["data"]
 
@@ -661,10 +653,14 @@ def generate_pdf(student_index):
     # Create File Path
     # ------------------------------------------
 
-    output_path = (
-        config.GENERATED_FOLDER
-        + "/"
-        + file_name
+    output_path = os.path.join(
+        config.GENERATED_FOLDER,
+        file_name
+    )
+
+    os.makedirs(
+        config.GENERATED_FOLDER,
+        exist_ok=True
     )
 
 
@@ -698,10 +694,9 @@ def generate_pdf(student_index):
 @app.route("/download-pdf/<filename>")
 def download_pdf(filename):
 
-    file_path = (
-        config.GENERATED_FOLDER
-        + "/"
-        + filename
+    file_path = os.path.join(
+        config.GENERATED_FOLDER,
+        filename
     )
 
 
@@ -726,10 +721,9 @@ def download_pdf(filename):
 @app.route("/preview-pdf/<filename>")
 def preview_pdf(filename):
 
-    file_path = (
-        config.GENERATED_FOLDER
-        + "/"
-        + filename
+    file_path = os.path.join(
+        config.GENERATED_FOLDER,
+        filename
     )
 
 
@@ -812,6 +806,11 @@ def generate_all_pdfs():
 
     generated_files = []
 
+    os.makedirs(
+        config.GENERATED_FOLDER,
+        exist_ok=True
+    )
+
 
     for student_result in student_results:
 
@@ -828,10 +827,9 @@ def generate_all_pdfs():
         )
 
 
-        output_path = (
-            config.GENERATED_FOLDER
-            + "/"
-            + file_name
+        output_path = os.path.join(
+            config.GENERATED_FOLDER,
+            file_name
         )
 
 
