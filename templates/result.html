@@ -21,12 +21,18 @@
         <h1>Result Preview</h1>
 
 
+        <!-- ================================= -->
+        <!-- Result Summary -->
+        <!-- ================================= -->
+
         <h2>Result Summary</h2>
+
 
         <p>
             <strong>Excel Format:</strong>
             {{ excel_format }}
         </p>
+
 
         <p>
             <strong>Total Students:</strong>
@@ -44,34 +50,51 @@
         {% endif %}
 
 
+        <!-- ================================= -->
+        <!-- Profile Information -->
+        <!-- ================================= -->
+
         {% if profile %}
 
         <h2>Profile Information</h2>
+
+        <p>
+            <strong>College Name:</strong>
+            {{ profile.get(
+            'college_name',
+            ''
+            ) }}
+        </p>
 
         <p>
             <strong>Department:</strong>
             {{ profile.get('department', '') }}
         </p>
 
+
         <p>
             <strong>Course:</strong>
             {{ profile.get('course', '') }}
         </p>
+
 
         <p>
             <strong>Class:</strong>
             {{ profile.get('class', '') }}
         </p>
 
+
         <p>
             <strong>Semester:</strong>
             {{ profile.get('semester', '') }}
         </p>
 
+
         <p>
             <strong>Academic Year:</strong>
             {{ profile.get('academic_year', '') }}
         </p>
+
 
         <p>
             <strong>Examination:</strong>
@@ -84,10 +107,15 @@
         <hr>
 
 
+        <!-- ================================= -->
+        <!-- PDF Generation -->
+        <!-- ================================= -->
+
         <h2>PDF Generation</h2>
 
+
         <p>
-            Generate PDF results for the students below.
+            Generate result PDFs for all students.
         </p>
 
 
@@ -100,9 +128,36 @@
         </form>
 
 
+        <br>
+
+
+        <!-- ================================= -->
+        <!-- Download All PDFs -->
+        <!-- ================================= -->
+
         {% if generated_files %}
 
-        <h3>Generated PDF Files</h3>
+        <a href="{{ url_for('download_all_pdfs') }}">
+
+            <button type="button">
+                Download All PDFs
+            </button>
+
+        </a>
+
+        {% endif %}
+
+
+        <!-- ================================= -->
+        <!-- Generated Files -->
+        <!-- ================================= -->
+
+        {% if generated_files %}
+
+        <h3>
+            Generated PDF Files
+        </h3>
+
 
         <ul>
 
@@ -110,7 +165,10 @@
 
             <li>
 
-                <a href="{{ url_for('download_pdf', filename=file) }}">
+                <a href="{{ url_for(
+                                'download_pdf',
+                                filename=file
+                            ) }}">
                     {{ file }}
                 </a>
 
@@ -126,6 +184,10 @@
         <hr>
 
 
+        <!-- ================================= -->
+        <!-- Student Results -->
+        <!-- ================================= -->
+
         <h2>Student Results</h2>
 
 
@@ -133,16 +195,30 @@
 
         <div class="result-card">
 
+
+            <!-- Student Name -->
+
             <h2>
                 {{ student["Student Name"] }}
             </h2>
 
 
+            <!-- Roll Number -->
+
             <p>
-                <strong>Roll No:</strong>
+
+                <strong>
+                    Roll No:
+                </strong>
+
                 {{ student["Roll No"] }}
+
             </p>
 
+
+            <!-- ================================= -->
+            <!-- Subject Results -->
+            <!-- ================================= -->
 
             <table border="1">
 
@@ -193,25 +269,31 @@
                             {{ subject }}
                         </td>
 
+
                         <td>
                             {{ data["marks"] }}
                         </td>
+
 
                         <td>
                             {{ data["grade"] }}
                         </td>
 
+
                         <td>
                             {{ data["grade_point"] }}
                         </td>
+
 
                         <td>
                             {{ data["credit"] }}
                         </td>
 
+
                         <td>
                             {{ data["credit_point"] }}
                         </td>
+
 
                         <td>
                             {{ data["status"] }}
@@ -229,7 +311,13 @@
             <br>
 
 
-            <h3>Result Summary</h3>
+            <!-- ================================= -->
+            <!-- Result Summary -->
+            <!-- ================================= -->
+
+            <h3>
+                Result Summary
+            </h3>
 
 
             <table border="1">
@@ -295,12 +383,15 @@
                     </th>
 
                     <td>
+
                         <strong>
                             {{ student["sgpa"] }}
                         </strong>
+
                     </td>
 
                 </tr>
+
 
                 <tr>
 
@@ -309,6 +400,7 @@
                     </th>
 
                     <td>
+
                         <strong>
                             {{ student["cgpa"] }}
                         </strong>
@@ -346,31 +438,43 @@
             <br>
 
 
-            <a href="{{ url_for(
-                        'generate_pdf',
-                        roll_no=student['Roll No']
-                    ) }}">
+            <!-- ================================= -->
+            <!-- Individual PDF Actions -->
+            <!-- ================================= -->
 
-                <button type="button">
-                    Generate PDF
-                </button>
-
-            </a>
+            <div class="pdf-actions">
 
 
-            <br><br>
+                <!-- Preview PDF -->
+
+                <a href="{{ url_for(
+                            'preview_pdf',
+                            roll_no=student['Roll No']
+                        ) }}" target="_blank">
+
+                    <button type="button">
+                        Preview PDF
+                    </button>
+
+                </a>
 
 
-            <a href="{{ url_for(
-                        'preview_pdf',
-                        roll_no=student['Roll No']
-                    ) }}">
+                <!-- Download PDF -->
 
-                <button type="button">
-                    Preview PDF
-                </button>
+                <a href="{{ url_for(
+                            'generate_pdf',
+                            roll_no=student['Roll No']
+                        ) }}">
 
-            </a>
+                    <button type="button">
+                        Download PDF
+                    </button>
+
+                </a>
+
+
+            </div>
+
 
         </div>
 
@@ -380,9 +484,14 @@
         <br>
 
 
+        <!-- ================================= -->
+        <!-- Navigation -->
+        <!-- ================================= -->
+
         <a href="{{ url_for('configure_credits') }}">
             Back to Subject Credits
         </a>
+
 
         <br><br>
 
@@ -391,6 +500,7 @@
             Back to Profiles
         </a>
 
+
         <br><br>
 
 
@@ -398,7 +508,9 @@
             Home
         </a>
 
+
     </div>
+
 
 </body>
 

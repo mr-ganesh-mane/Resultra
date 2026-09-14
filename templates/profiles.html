@@ -19,72 +19,137 @@
 
 </head>
 
+
 <body>
 
-    <h1>Result Profiles</h1>
+    <div class="container">
 
-    <p>
-        Create and manage reusable result profiles.
-    </p>
-
-
-    {% if error %}
+        <h1>Result Profiles</h1>
 
         <p>
-            {{ error }}
+            Select an existing profile or create a new profile.
         </p>
 
-    {% endif %}
 
+        {% if error %}
 
-    <a href="{{ url_for('new_profile') }}">
-        Create New Profile
-    </a>
-
-    <br>
-    <br>
-
-
-    {% if profiles %}
-
-        <h2>Saved Profiles</h2>
-
-        {% for profile in profiles %}
-
-            <div>
-
-                <strong>
-                    {{ profile }}
-                </strong>
-
-                &nbsp;
-
-                <a
-                    href="{{ url_for('view_profile', profile_name=profile) }}"
-                >
-                    View / Use Profile
-                </a>
-
+            <div class="error">
+                {{ error }}
             </div>
 
-            <br>
-
-        {% endfor %}
-
-    {% else %}
-
-        <p>
-            No profiles created yet.
-        </p>
-
-    {% endif %}
+        {% endif %}
 
 
-    <br>
+        {% if success %}
 
-    <a href="{{ url_for('home') }}">
-        Back to Home
-    </a>
+            <div class="success">
+                {{ success }}
+            </div>
+
+        {% endif %}
+
+
+        <h2>Profiles</h2>
+
+
+        {% if profiles %}
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Profile Name
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for profile in profiles %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    {{ profile }}
+                                </strong>
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for(
+                                        'view_profile',
+                                        profile_name=profile
+                                    ) }}"
+                                >
+                                    <button type="button">
+                                        View
+                                    </button>
+                                </a>
+
+
+                                <a
+                                    href="{{ url_for(
+                                        'use_profile',
+                                        profile_name=profile
+                                    ) }}"
+                                >
+                                    <button type="button">
+                                        Use Profile
+                                    </button>
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        {% else %}
+
+            <p>
+                No profiles created yet.
+            </p>
+
+        {% endif %}
+
+
+        <br>
+
+
+        <a
+            href="{{ url_for('new_profile') }}"
+        >
+            <button type="button">
+                Create New Profile
+            </button>
+        </a>
+
+
+        <br><br>
+
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+    </div>
 
 </body>
 

@@ -10,7 +10,13 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Result Preview - Resultra</title>
+    <title>
+        {% if new_profile %}
+            Create New Profile - Resultra
+        {% else %}
+            Profile - Resultra
+        {% endif %}
+    </title>
 
     <link
         rel="stylesheet"
@@ -24,504 +30,418 @@
 
     <div class="container">
 
-        <h1>Result Preview</h1>
 
+        {% if new_profile %}
 
-        <!-- ================================= -->
-        <!-- Result Summary -->
-        <!-- ================================= -->
+            <!-- ================================= -->
+            <!-- Create New Profile -->
+            <!-- ================================= -->
 
-        <h2>Result Summary</h2>
-
-
-        <p>
-            <strong>Excel Format:</strong>
-            {{ excel_format }}
-        </p>
-
-
-        <p>
-            <strong>Total Students:</strong>
-            {{ results|length }}
-        </p>
-
-
-        {% if profile_name %}
-
-            <p>
-                <strong>Profile:</strong>
-                {{ profile_name }}
-            </p>
-
-        {% endif %}
-
-
-        <!-- ================================= -->
-        <!-- Profile Information -->
-        <!-- ================================= -->
-
-        {% if profile %}
-
-            <h2>Profile Information</h2>
+            <h1>
+                Create New Profile
+            </h1>
 
 
             <p>
-                <strong>Department:</strong>
-                {{ profile.get(
-                    'department',
-                    ''
-                ) }}
+                Create a reusable result profile.
             </p>
 
 
-            <p>
-                <strong>Course:</strong>
-                {{ profile.get(
-                    'course',
-                    ''
-                ) }}
-            </p>
+            {% if error %}
+
+                <div class="error">
+                    {{ error }}
+                </div>
+
+            {% endif %}
 
 
-            <p>
-                <strong>Class:</strong>
-                {{ profile.get(
-                    'class',
-                    ''
-                ) }}
-            </p>
+            <form
+                method="POST"
+                action="{{ url_for('new_profile') }}"
+            >
 
-
-            <p>
-                <strong>Semester:</strong>
-                {{ profile.get(
-                    'semester',
-                    ''
-                ) }}
-            </p>
-
-
-            <p>
-                <strong>Academic Year:</strong>
-                {{ profile.get(
-                    'academic_year',
-                    ''
-                ) }}
-            </p>
-
-
-            <p>
-                <strong>Examination:</strong>
-                {{ profile.get(
-                    'examination',
-                    ''
-                ) }}
-            </p>
-
-        {% endif %}
-
-
-        <hr>
-
-
-        <!-- ================================= -->
-        <!-- PDF Generation -->
-        <!-- ================================= -->
-
-        <h2>PDF Generation</h2>
-
-
-        <p>
-            Preview or generate result PDFs.
-        </p>
-
-
-        <form
-            method="POST"
-            action="{{ url_for('generate_all_pdfs') }}"
-        >
-
-            <button type="submit">
-                Generate All PDFs
-            </button>
-
-        </form>
-
-
-        <!-- ================================= -->
-        <!-- Generated Files -->
-        <!-- ================================= -->
-
-        {% if generated_files %}
-
-            <h3>Generated PDF Files</h3>
-
-
-            <ul>
-
-                {% for file in generated_files %}
-
-                    <li>
-
-                        <a
-                            href="{{ url_for(
-                                'download_pdf',
-                                filename=file
-                            ) }}"
-                        >
-                            {{ file }}
-                        </a>
-
-                    </li>
-
-                {% endfor %}
-
-            </ul>
-
-        {% endif %}
-
-
-        <hr>
-
-
-        <!-- ================================= -->
-        <!-- Student Results -->
-        <!-- ================================= -->
-
-        <h2>Student Results</h2>
-
-
-        {% for student in results %}
-
-            <div class="result-card">
-
-
-                <!-- Student Name -->
 
                 <h2>
-                    {{ student["Student Name"] }}
+                    Profile Information
                 </h2>
 
 
-                <!-- Roll Number -->
+                <!-- College Name -->
 
-                <p>
+                <label for="college_name">
+                    College Name
+                </label>
 
-                    <strong>
-                        Roll No:
-                    </strong>
+                <input
+                    type="text"
+                    id="college_name"
+                    name="college_name"
+                    required
+                >
 
-                    {{ student["Roll No"] }}
 
-                </p>
+                <!-- Department -->
 
+                <label for="department">
+                    Department
+                </label>
 
-                <!-- ================================= -->
-                <!-- Subject Results -->
-                <!-- ================================= -->
+                <input
+                    type="text"
+                    id="department"
+                    name="department"
+                >
 
-                <table border="1">
 
-                    <thead>
+                <!-- Course -->
 
-                        <tr>
+                <label for="course">
+                    Course
+                </label>
 
-                            <th>
-                                Subject
-                            </th>
+                <input
+                    type="text"
+                    id="course"
+                    name="course"
+                >
 
-                            <th>
-                                Marks
-                            </th>
 
-                            <th>
-                                Grade
-                            </th>
+                <!-- Class -->
 
-                            <th>
-                                Grade Point
-                            </th>
+                <label for="class">
+                    Class
+                </label>
 
-                            <th>
-                                Credit
-                            </th>
+                <input
+                    type="text"
+                    id="class"
+                    name="class"
+                >
 
-                            <th>
-                                Credit Point
-                            </th>
 
-                            <th>
-                                Status
-                            </th>
+                <!-- Semester -->
 
-                        </tr>
+                <label for="semester">
+                    Semester
+                </label>
 
-                    </thead>
+                <input
+                    type="text"
+                    id="semester"
+                    name="semester"
+                >
 
 
-                    <tbody>
+                <!-- Academic Year -->
 
-                        {% for subject, data in student["subjects"].items() %}
+                <label for="academic_year">
+                    Academic Year
+                </label>
 
-                            <tr>
+                <input
+                    type="text"
+                    id="academic_year"
+                    name="academic_year"
+                >
 
-                                <td>
-                                    {{ subject }}
-                                </td>
 
+                <!-- Examination -->
 
-                                <td>
-                                    {{ data["marks"] }}
-                                </td>
+                <label for="examination">
+                    Examination
+                </label>
 
+                <input
+                    type="text"
+                    id="examination"
+                    name="examination"
+                >
 
-                                <td>
-                                    {{ data["grade"] }}
-                                </td>
 
+                <br><br>
 
-                                <td>
-                                    {{ data["grade_point"] }}
-                                </td>
 
+                <button type="submit">
+                    Create Profile
+                </button>
 
-                                <td>
-                                    {{ data["credit"] }}
-                                </td>
 
+            </form>
 
-                                <td>
-                                    {{ data["credit_point"] }}
-                                </td>
 
+            <br><br>
 
-                                <td>
-                                    {{ data["status"] }}
-                                </td>
 
-                            </tr>
+            <a href="{{ url_for('profiles') }}">
+                Back to Profiles
+            </a>
 
-                        {% endfor %}
 
-                    </tbody>
+            <br><br>
 
-                </table>
 
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
 
-                <br>
 
+        {% else %}
 
-                <!-- ================================= -->
-                <!-- Result Summary -->
-                <!-- ================================= -->
 
-                <h3>
-                    Result Summary
-                </h3>
+            <!-- ================================= -->
+            <!-- Existing Profile -->
+            <!-- ================================= -->
 
+            <h1>
+                Profile
+            </h1>
 
-                <table border="1">
 
-                    <tr>
+            {% if error %}
 
-                        <th>
-                            Total Marks
-                        </th>
-
-                        <td>
-
-                            {{ student["total"] }}
-
-                            /
-
-                            {{ student["maximum_marks"] }}
-
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <th>
-                            Percentage
-                        </th>
-
-                        <td>
-
-                            {{ student["percentage"] }}%
-
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <th>
-                            Total Credits
-                        </th>
-
-                        <td>
-
-                            {{ student["total_credits"] }}
-
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <th>
-                            Total Credit Points
-                        </th>
-
-                        <td>
-
-                            {{ student["total_credit_points"] }}
-
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <th>
-                            SGPA
-                        </th>
-
-                        <td>
-
-                            <strong>
-                                {{ student["sgpa"] }}
-                            </strong>
-
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <th>
-                            CGPA
-                        </th>
-
-                        <td>
-
-                            <strong>
-                                {{ student["cgpa"] }}
-                            </strong>
-
-                            <br>
-
-                            <small>
-                                Based on current semester
-                            </small>
-
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <th>
-                            Overall Result
-                        </th>
-
-                        <td>
-
-                            <strong>
-                                {{ student["result"] }}
-                            </strong>
-
-                        </td>
-
-                    </tr>
-
-                </table>
-
-
-                <br>
-
-
-                <!-- ================================= -->
-                <!-- PDF Actions -->
-                <!-- ================================= -->
-
-                <div class="pdf-actions">
-
-
-                    <!-- PDF Preview -->
-
-                    <a
-                        href="{{ url_for(
-                            'preview_pdf',
-                            roll_no=student['Roll No']
-                        ) }}"
-                        target="_blank"
-                    >
-
-                        <button type="button">
-                            Preview PDF
-                        </button>
-
-                    </a>
-
-
-                    <!-- PDF Download -->
-
-                    <a
-                        href="{{ url_for(
-                            'generate_pdf',
-                            roll_no=student['Roll No']
-                        ) }}"
-                    >
-
-                        <button type="button">
-                            Download PDF
-                        </button>
-
-                    </a>
-
-
+                <div class="error">
+                    {{ error }}
                 </div>
 
-
-            </div>
-
-        {% endfor %}
+            {% endif %}
 
 
-        <br>
+            {% if success %}
+
+                <div class="success">
+                    {{ success }}
+                </div>
+
+            {% endif %}
 
 
-        <!-- ================================= -->
-        <!-- Navigation -->
-        <!-- ================================= -->
-
-        <a href="{{ url_for('configure_credits') }}">
-            Back to Subject Credits
-        </a>
+            <h2>
+                {{ profile_name }}
+            </h2>
 
 
-        <br><br>
+            <!-- ================================= -->
+            <!-- Profile Information -->
+            <!-- ================================= -->
+
+            <h2>
+                Profile Information
+            </h2>
 
 
-        <a href="{{ url_for('profiles') }}">
-            Back to Profiles
-        </a>
+            <table>
+
+                <tr>
+
+                    <th>
+                        College Name
+                    </th>
+
+                    <td>
+                        {{ profile.get(
+                            'college_name',
+                            ''
+                        ) }}
+                    </td>
+
+                </tr>
 
 
-        <br><br>
+                <tr>
+
+                    <th>
+                        Department
+                    </th>
+
+                    <td>
+                        {{ profile.get(
+                            'department',
+                            ''
+                        ) }}
+                    </td>
+
+                </tr>
 
 
-        <a href="{{ url_for('home') }}">
-            Home
-        </a>
+                <tr>
+
+                    <th>
+                        Course
+                    </th>
+
+                    <td>
+                        {{ profile.get(
+                            'course',
+                            ''
+                        ) }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th>
+                        Class
+                    </th>
+
+                    <td>
+                        {{ profile.get(
+                            'class',
+                            ''
+                        ) }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th>
+                        Semester
+                    </th>
+
+                    <td>
+                        {{ profile.get(
+                            'semester',
+                            ''
+                        ) }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th>
+                        Academic Year
+                    </th>
+
+                    <td>
+                        {{ profile.get(
+                            'academic_year',
+                            ''
+                        ) }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th>
+                        Examination
+                    </th>
+
+                    <td>
+                        {{ profile.get(
+                            'examination',
+                            ''
+                        ) }}
+                    </td>
+
+                </tr>
+
+            </table>
+
+
+            <!-- ================================= -->
+            <!-- Profile Settings -->
+            <!-- ================================= -->
+
+            <h2>
+                Profile Settings
+            </h2>
+
+
+            <a
+                href="{{ url_for(
+                    'use_profile',
+                    profile_name=profile_name
+                ) }}"
+            >
+
+                <button type="button">
+                    Use Profile
+                </button>
+
+            </a>
+
+
+            <br><br>
+
+
+            <a
+                href="{{ url_for(
+                    'profile_rules',
+                    profile_name=profile_name
+                ) }}"
+            >
+
+                <button type="button">
+                    Result Rules
+                </button>
+
+            </a>
+
+
+            <br><br>
+
+
+            <a
+                href="{{ url_for(
+                    'profile_design',
+                    profile_name=profile_name
+                ) }}"
+            >
+
+                <button type="button">
+                    PDF Template & Design
+                </button>
+
+            </a>
+
+
+            <br><br>
+
+
+            <a
+                href="{{ url_for(
+                    'delete_profile_route',
+                    profile_name=profile_name
+                ) }}"
+                onclick="
+                    return confirm(
+                        'Are you sure you want to delete this profile?'
+                    );
+                "
+            >
+
+                <button type="button">
+                    Delete Profile
+                </button>
+
+            </a>
+
+
+            <br><br>
+
+
+            <a href="{{ url_for('profiles') }}">
+                Back to Profiles
+            </a>
+
+
+            <br><br>
+
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+
+        {% endif %}
 
 
     </div>

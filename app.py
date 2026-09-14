@@ -5,10 +5,12 @@ from flask import (
     redirect,
     url_for,
     send_from_directory,
+    send_file,
     session
 )
 
 import os
+import zipfile
 
 import config
 
@@ -39,6 +41,11 @@ from core.pdf_generator import (
 
 app = Flask(__name__)
 
+
+# ========================================
+# Configuration
+# ========================================
+
 app.config["UPLOAD_FOLDER"] = (
     config.UPLOAD_FOLDER
 )
@@ -55,12 +62,13 @@ app.config["MAX_CONTENT_LENGTH"] = (
     config.MAX_CONTENT_LENGTH
 )
 
+
 app.secret_key = "resultra-secret-key"
 
 
-# ----------------------------------------
+# ========================================
 # Create Required Folders
-# ----------------------------------------
+# ========================================
 
 os.makedirs(
     config.UPLOAD_FOLDER,
@@ -78,9 +86,9 @@ os.makedirs(
 )
 
 
-# ----------------------------------------
+# ========================================
 # Home
-# ----------------------------------------
+# ========================================
 
 @app.route("/")
 def home():
@@ -90,9 +98,9 @@ def home():
     )
 
 
-# ----------------------------------------
+# ========================================
 # Upload Excel
-# ----------------------------------------
+# ========================================
 
 @app.route(
     "/upload",
@@ -113,7 +121,6 @@ def upload():
         )
 
 
-    # Check file
     if "excel_file" not in request.files:
 
         return render_template(
@@ -135,7 +142,6 @@ def upload():
         )
 
 
-    # Check extension
     if "." not in file.filename:
 
         return render_template(
@@ -161,7 +167,6 @@ def upload():
         )
 
 
-    # Save Excel file
     file_path = os.path.join(
         config.UPLOAD_FOLDER,
         file.filename
@@ -173,13 +178,11 @@ def upload():
 
     try:
 
-        # Read Excel
         excel_result = read_excel(
             file_path
         )
 
 
-        # Validate Excel
         errors = validate_excel(
             excel_result
         )
@@ -194,11 +197,9 @@ def upload():
             )
 
 
-        # Get student data
         data = excel_result["data"]
 
 
-        # Detect subjects dynamically
         subjects = [
 
             column
@@ -213,7 +214,6 @@ def upload():
         ]
 
 
-        # Store upload information
         session["subjects"] = subjects
 
         session["excel_format"] = (
@@ -224,12 +224,6 @@ def upload():
             file.filename
         )
 
-
-        # --------------------------------
-        # Do NOT calculate here.
-        #
-        # First configure subject credits.
-        # --------------------------------
 
         if not selected_profile:
 
@@ -255,9 +249,9 @@ def upload():
         )
 
 
-# ----------------------------------------
+# ========================================
 # Configure Subject Credits
-# ----------------------------------------
+# ========================================
 
 @app.route(
     "/configure-credits",
@@ -281,10 +275,6 @@ def configure_credits():
     )
 
 
-    # --------------------------------
-    # Check required session data
-    # --------------------------------
-
     if not subjects:
 
         return redirect(
@@ -305,10 +295,6 @@ def configure_credits():
             url_for("profiles")
         )
 
-
-    # --------------------------------
-    # Load Profile
-    # --------------------------------
 
     profile = load_profile(
         config.PROFILE_FOLDER,
@@ -417,10 +403,6 @@ def configure_credits():
         subject_credits[subject] = credit
 
 
-    # --------------------------------
-    # Make sure all subjects have credits
-    # --------------------------------
-
     for subject in subjects:
 
         if subject not in subject_credits:
@@ -437,18 +419,10 @@ def configure_credits():
             )
 
 
-    # --------------------------------
-    # Update Rules
-    # --------------------------------
-
     rules["subject_credits"] = (
         subject_credits
     )
 
-
-    # --------------------------------
-    # Save Rules
-    # --------------------------------
 
     save_profile_rules(
         config.PROFILE_FOLDER,
@@ -456,10 +430,6 @@ def configure_credits():
         rules
     )
 
-
-    # --------------------------------
-    # Read Excel Again
-    # --------------------------------
 
     file_path = os.path.join(
         config.UPLOAD_FOLDER,
@@ -474,7 +444,6 @@ def configure_credits():
         )
 
 
-        # Validate again
         errors = validate_excel(
             excel_result
         )
@@ -493,10 +462,6 @@ def configure_credits():
 
         data = excel_result["data"]
 
-
-        # --------------------------------
-        # Calculate Student Results
-        # --------------------------------
 
         student_results = []
 
@@ -519,15 +484,10 @@ def configure_credits():
             )
 
 
-        # Store results
         session["student_results"] = (
             student_results
         )
 
-
-        # --------------------------------
-        # Result Preview
-        # --------------------------------
 
         return render_template(
             "result.html",
@@ -553,9 +513,9 @@ def configure_credits():
         )
 
 
-# ----------------------------------------
+# ========================================
 # Profiles
-# ----------------------------------------
+# ========================================
 
 @app.route("/profiles")
 def profiles():
@@ -571,9 +531,9 @@ def profiles():
     )
 
 
-# ----------------------------------------
+# ========================================
 # View Profile
-# ----------------------------------------
+# ========================================
 
 @app.route(
     "/profile/<profile_name>"
@@ -604,9 +564,9 @@ def view_profile(profile_name):
     )
 
 
-# ----------------------------------------
+# ========================================
 # Use Profile
-# ----------------------------------------
+# ========================================
 
 @app.route(
     "/profile/<profile_name>/use"
@@ -640,9 +600,9 @@ def use_profile(profile_name):
     )
 
 
-# ----------------------------------------
+# ========================================
 # New Profile
-# ----------------------------------------
+# ========================================
 
 @app.route(
     "/profile/new",
@@ -689,48 +649,58 @@ def new_profile():
 
     profile = {
 
-        "department": request.form.get(
-            "department",
-            ""
-        ).strip(),
+    "college_name": request.form.get(
+        "college_name",
+        ""
+    ).strip(),
 
-        "course": request.form.get(
-            "course",
-            ""
-        ).strip(),
+    "department": request.form.get(
+        "department",
+        ""
+    ).strip(),
 
-        "class": request.form.get(
-            "class",
-            ""
-        ).strip(),
+    "course": request.form.get(
+        "course",
+        ""
+    ).strip(),
 
-        "semester": request.form.get(
-            "semester",
-            ""
-        ).strip(),
+    "class": request.form.get(
+        "class",
+        ""
+    ).strip(),
 
-        "academic_year": request.form.get(
-            "academic_year",
-            ""
-        ).strip(),
+    "semester": request.form.get(
+        "semester",
+        ""
+    ).strip(),
 
-        "examination": request.form.get(
-            "examination",
-            ""
-        ).strip(),
+    "academic_year": request.form.get(
+        "academic_year",
+        ""
+    ).strip(),
 
-        "rules": DEFAULT_RULES,
+    "examination": request.form.get(
+        "examination",
+        ""
+    ).strip(),
 
-        "design": {
+    "rules": DEFAULT_RULES,
 
-            "page_size": "A4",
+    "design": {
 
-            "orientation": "portrait"
+        "page_size": "A4",
 
-        }
+        "orientation": "portrait",
+
+        "header_title": "STUDENT RESULT",
+
+        "header_subtitle": "",
+
+        "footer_text": "Generated by Resultra"
 
     }
 
+}
 
     save_profile(
         config.PROFILE_FOLDER,
@@ -744,9 +714,9 @@ def new_profile():
     )
 
 
-# ----------------------------------------
+# ========================================
 # Delete Profile
-# ----------------------------------------
+# ========================================
 
 @app.route(
     "/profile/<profile_name>/delete"
@@ -774,9 +744,9 @@ def delete_profile_route(profile_name):
     )
 
 
-# ----------------------------------------
-# Profile Rules
-# ----------------------------------------
+# ========================================
+# Result Rules
+# ========================================
 
 @app.route(
     "/profile/<profile_name>/rules",
@@ -800,10 +770,6 @@ def profile_rules(profile_name):
             error="Profile not found."
         )
 
-
-    # --------------------------------
-    # GET
-    # --------------------------------
 
     if request.method == "GET":
 
@@ -848,10 +814,6 @@ def profile_rules(profile_name):
             rules=rules
         )
 
-
-    # --------------------------------
-    # Basic Rules
-    # --------------------------------
 
     passing_marks = request.form.get(
         "passing_marks",
@@ -903,10 +865,6 @@ def profile_rules(profile_name):
             )
         )
 
-
-    # --------------------------------
-    # Grade Rules
-    # --------------------------------
 
     grade_ranges = []
 
@@ -974,10 +932,6 @@ def profile_rules(profile_name):
     )
 
 
-    # --------------------------------
-    # Subject Credits
-    # --------------------------------
-
     subjects = request.form.getlist(
         "subject"
     )
@@ -1021,10 +975,6 @@ def profile_rules(profile_name):
         )
 
 
-    # --------------------------------
-    # Save Rules
-    # --------------------------------
-
     rules = {
 
         "passing_marks": passing_marks,
@@ -1054,9 +1004,10 @@ def profile_rules(profile_name):
         )
     )
 
-# ----------------------------------------
+
+# ========================================
 # PDF Template & Design
-# ----------------------------------------
+# ========================================
 
 @app.route(
     "/profile/<profile_name>/design",
@@ -1081,16 +1032,11 @@ def profile_design(profile_name):
         )
 
 
-    # Get existing design
     design = profile.get(
         "design",
         {}
     ).copy()
 
-
-    # --------------------------------
-    # GET
-    # --------------------------------
 
     if request.method == "GET":
 
@@ -1100,10 +1046,6 @@ def profile_design(profile_name):
             design=design
         )
 
-
-    # --------------------------------
-    # POST
-    # --------------------------------
 
     page_size = request.form.get(
         "page_size",
@@ -1135,10 +1077,6 @@ def profile_design(profile_name):
     ).strip()
 
 
-    # --------------------------------
-    # Validate Page Size
-    # --------------------------------
-
     if page_size not in [
         "A4",
         "LETTER"
@@ -1147,10 +1085,6 @@ def profile_design(profile_name):
         page_size = "A4"
 
 
-    # --------------------------------
-    # Validate Orientation
-    # --------------------------------
-
     if orientation not in [
         "portrait",
         "landscape"
@@ -1158,10 +1092,6 @@ def profile_design(profile_name):
 
         orientation = "portrait"
 
-
-    # --------------------------------
-    # Save Design
-    # --------------------------------
 
     design = {
 
@@ -1198,9 +1128,10 @@ def profile_design(profile_name):
         )
     )
 
-# ----------------------------------------
+
+# ========================================
 # Generate Individual PDF
-# ----------------------------------------
+# ========================================
 
 @app.route(
     "/generate-pdf/<roll_no>"
@@ -1285,9 +1216,9 @@ def generate_pdf(roll_no):
     )
 
 
-# ----------------------------------------
-# Download PDF
-# ----------------------------------------
+# ========================================
+# Download Individual PDF
+# ========================================
 
 @app.route(
     "/download-pdf/<filename>"
@@ -1301,9 +1232,9 @@ def download_pdf(filename):
     )
 
 
-# ----------------------------------------
-# Preview PDF
-# ----------------------------------------
+# ========================================
+# Preview Individual PDF
+# ========================================
 
 @app.route(
     "/preview-pdf/<roll_no>"
@@ -1387,9 +1318,9 @@ def preview_pdf(roll_no):
     )
 
 
-# ----------------------------------------
+# ========================================
 # Generate All PDFs
-# ----------------------------------------
+# ========================================
 
 @app.route(
     "/generate-all-pdfs",
@@ -1474,9 +1405,116 @@ def generate_all_pdfs():
     )
 
 
-# ----------------------------------------
+# ========================================
+# Download All PDFs as ZIP
+# ========================================
+
+@app.route(
+    "/download-all-pdfs"
+)
+def download_all_pdfs():
+
+    student_results = session.get(
+        "student_results",
+        []
+    )
+
+
+    profile_name = session.get(
+        "selected_profile"
+    )
+
+
+    if not student_results:
+
+        return redirect(
+            url_for("home")
+        )
+
+
+    if not profile_name:
+
+        return redirect(
+            url_for("profiles")
+        )
+
+
+    profile = load_profile(
+        config.PROFILE_FOLDER,
+        profile_name
+    )
+
+
+    if profile is None:
+
+        return redirect(
+            url_for("profiles")
+        )
+
+
+    zip_file_name = (
+        f"{profile_name}_results.zip"
+    )
+
+
+    zip_path = os.path.join(
+        config.GENERATED_FOLDER,
+        zip_file_name
+    )
+
+
+    # --------------------------------
+    # Generate PDFs and create ZIP
+    # --------------------------------
+
+    with zipfile.ZipFile(
+        zip_path,
+        "w",
+        zipfile.ZIP_DEFLATED
+    ) as zip_file:
+
+
+        for student_result in student_results:
+
+            roll_no = student_result[
+                "Roll No"
+            ]
+
+
+            pdf_file_name = (
+                f"{roll_no}_result.pdf"
+            )
+
+
+            pdf_path = os.path.join(
+                config.GENERATED_FOLDER,
+                pdf_file_name
+            )
+
+
+            generate_student_pdf(
+                student_result,
+                profile,
+                pdf_path
+            )
+
+
+            zip_file.write(
+                pdf_path,
+                arcname=pdf_file_name
+            )
+
+
+    return send_file(
+        zip_path,
+        as_attachment=True,
+        download_name=zip_file_name
+    )
+
+
+# ========================================
 # Run Application
-# ----------------------------------------
+# ========================================
 
 if __name__ == "__main__":
 
