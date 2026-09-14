@@ -1054,6 +1054,149 @@ def profile_rules(profile_name):
         )
     )
 
+# ----------------------------------------
+# PDF Template & Design
+# ----------------------------------------
+
+@app.route(
+    "/profile/<profile_name>/design",
+    methods=["GET", "POST"]
+)
+def profile_design(profile_name):
+
+    profile = load_profile(
+        config.PROFILE_FOLDER,
+        profile_name
+    )
+
+
+    if profile is None:
+
+        return render_template(
+            "profiles.html",
+            profiles=list_profiles(
+                config.PROFILE_FOLDER
+            ),
+            error="Profile not found."
+        )
+
+
+    # Get existing design
+    design = profile.get(
+        "design",
+        {}
+    ).copy()
+
+
+    # --------------------------------
+    # GET
+    # --------------------------------
+
+    if request.method == "GET":
+
+        return render_template(
+            "design.html",
+            profile_name=profile_name,
+            design=design
+        )
+
+
+    # --------------------------------
+    # POST
+    # --------------------------------
+
+    page_size = request.form.get(
+        "page_size",
+        "A4"
+    )
+
+
+    orientation = request.form.get(
+        "orientation",
+        "portrait"
+    )
+
+
+    header_title = request.form.get(
+        "header_title",
+        ""
+    ).strip()
+
+
+    header_subtitle = request.form.get(
+        "header_subtitle",
+        ""
+    ).strip()
+
+
+    footer_text = request.form.get(
+        "footer_text",
+        ""
+    ).strip()
+
+
+    # --------------------------------
+    # Validate Page Size
+    # --------------------------------
+
+    if page_size not in [
+        "A4",
+        "LETTER"
+    ]:
+
+        page_size = "A4"
+
+
+    # --------------------------------
+    # Validate Orientation
+    # --------------------------------
+
+    if orientation not in [
+        "portrait",
+        "landscape"
+    ]:
+
+        orientation = "portrait"
+
+
+    # --------------------------------
+    # Save Design
+    # --------------------------------
+
+    design = {
+
+        "page_size": page_size,
+
+        "orientation": orientation,
+
+        "header_title": header_title,
+
+        "header_subtitle": header_subtitle,
+
+        "footer_text": footer_text
+
+    }
+
+
+    profile["design"] = design
+
+
+    save_profile(
+        config.PROFILE_FOLDER,
+        profile_name,
+        profile
+    )
+
+
+    return render_template(
+        "design.html",
+        profile_name=profile_name,
+        design=design,
+        success=(
+            "PDF template and design "
+            "saved successfully."
+        )
+    )
 
 # ----------------------------------------
 # Generate Individual PDF
