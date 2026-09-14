@@ -21,11 +21,11 @@ def calculate_student_result(
     - Total Marks
     - Percentage
     - SGPA
+    - CGPA
     - Overall Result
     """
 
     if rules is None:
-
         rules = DEFAULT_RULES
 
 
@@ -43,7 +43,6 @@ def calculate_student_result(
 
     subject_statuses = []
 
-
     total_marks = 0
 
     total_credits = 0
@@ -53,7 +52,7 @@ def calculate_student_result(
     subject_count = 0
 
 
-    # Get saved subject credits
+    # Get subject credits
     subject_credits = rules.get(
         "subject_credits",
         {}
@@ -61,35 +60,33 @@ def calculate_student_result(
 
 
     if subject_credits is None:
-
         subject_credits = {}
 
 
+    # --------------------------------
+    # Calculate Subject Results
+    # --------------------------------
+
     for subject, marks in student_data.items():
 
-        # Skip student information
         if subject in [
             "Roll No",
             "Student Name"
         ]:
-
             continue
 
 
-        # Convert marks
         try:
-
             marks = float(marks)
 
         except (
             ValueError,
             TypeError
         ):
-
             continue
 
 
-        # Apply grade rule
+        # Apply grade rules
         result = apply_subject_rule(
             marks,
             rules
@@ -109,21 +106,18 @@ def calculate_student_result(
 
 
         try:
-
             credit = float(credit)
 
         except (
             ValueError,
             TypeError
         ):
-
             credit = 0
 
 
-        # Calculate credit point
+        # Credit Point
         credit_point = (
-            grade_point
-            * credit
+            grade_point * credit
         )
 
 
@@ -190,6 +184,8 @@ def calculate_student_result(
 
             "sgpa": 0,
 
+            "cgpa": 0,
+
             "result": "FAIL"
 
         }
@@ -240,6 +236,22 @@ def calculate_student_result(
 
 
     # --------------------------------
+    # CGPA
+    #
+    # Current version:
+    # No previous semester records.
+    #
+    # Therefore:
+    # CGPA = SGPA
+    #
+    # This can be replaced in future
+    # when semester history is added.
+    # --------------------------------
+
+    cgpa = sgpa
+
+
+    # --------------------------------
     # Overall Result
     # --------------------------------
 
@@ -249,6 +261,10 @@ def calculate_student_result(
         )
     )
 
+
+    # --------------------------------
+    # Final Result
+    # --------------------------------
 
     return {
 
@@ -285,6 +301,11 @@ def calculate_student_result(
 
         "sgpa": round(
             sgpa,
+            2
+        ),
+
+        "cgpa": round(
+            cgpa,
             2
         ),
 

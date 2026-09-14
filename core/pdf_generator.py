@@ -502,6 +502,16 @@ def generate_student_pdf(
         ],
 
         [
+            "CGPA",
+            str(
+                student_result.get(
+                    "cgpa",
+                    0
+                )
+            )
+        ],
+
+        [
             "Overall Result",
             str(
                 student_result.get(

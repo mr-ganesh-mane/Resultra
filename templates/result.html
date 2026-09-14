@@ -5,17 +5,11 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Result Preview - Resultra</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
 </head>
 
@@ -42,47 +36,47 @@
 
         {% if profile_name %}
 
-            <p>
-                <strong>Profile:</strong>
-                {{ profile_name }}
-            </p>
+        <p>
+            <strong>Profile:</strong>
+            {{ profile_name }}
+        </p>
 
         {% endif %}
 
 
         {% if profile %}
 
-            <h2>Profile Information</h2>
+        <h2>Profile Information</h2>
 
-            <p>
-                <strong>Department:</strong>
-                {{ profile.get('department', '') }}
-            </p>
+        <p>
+            <strong>Department:</strong>
+            {{ profile.get('department', '') }}
+        </p>
 
-            <p>
-                <strong>Course:</strong>
-                {{ profile.get('course', '') }}
-            </p>
+        <p>
+            <strong>Course:</strong>
+            {{ profile.get('course', '') }}
+        </p>
 
-            <p>
-                <strong>Class:</strong>
-                {{ profile.get('class', '') }}
-            </p>
+        <p>
+            <strong>Class:</strong>
+            {{ profile.get('class', '') }}
+        </p>
 
-            <p>
-                <strong>Semester:</strong>
-                {{ profile.get('semester', '') }}
-            </p>
+        <p>
+            <strong>Semester:</strong>
+            {{ profile.get('semester', '') }}
+        </p>
 
-            <p>
-                <strong>Academic Year:</strong>
-                {{ profile.get('academic_year', '') }}
-            </p>
+        <p>
+            <strong>Academic Year:</strong>
+            {{ profile.get('academic_year', '') }}
+        </p>
 
-            <p>
-                <strong>Examination:</strong>
-                {{ profile.get('examination', '') }}
-            </p>
+        <p>
+            <strong>Examination:</strong>
+            {{ profile.get('examination', '') }}
+        </p>
 
         {% endif %}
 
@@ -97,10 +91,7 @@
         </p>
 
 
-        <form
-            method="POST"
-            action="{{ url_for('generate_all_pdfs') }}"
-        >
+        <form method="POST" action="{{ url_for('generate_all_pdfs') }}">
 
             <button type="submit">
                 Generate All PDFs
@@ -111,25 +102,23 @@
 
         {% if generated_files %}
 
-            <h3>Generated PDF Files</h3>
+        <h3>Generated PDF Files</h3>
 
-            <ul>
+        <ul>
 
-                {% for file in generated_files %}
+            {% for file in generated_files %}
 
-                    <li>
+            <li>
 
-                        <a
-                            href="{{ url_for('download_pdf', filename=file) }}"
-                        >
-                            {{ file }}
-                        </a>
+                <a href="{{ url_for('download_pdf', filename=file) }}">
+                    {{ file }}
+                </a>
 
-                    </li>
+            </li>
 
-                {% endfor %}
+            {% endfor %}
 
-            </ul>
+        </ul>
 
         {% endif %}
 
@@ -142,231 +131,248 @@
 
         {% for student in results %}
 
-            <div class="result-card">
+        <div class="result-card">
 
-                <h2>
-                    {{ student["Student Name"] }}
-                </h2>
-
-
-                <p>
-                    <strong>Roll No:</strong>
-                    {{ student["Roll No"] }}
-                </p>
+            <h2>
+                {{ student["Student Name"] }}
+            </h2>
 
 
-                <table border="1">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Subject
-                            </th>
-
-                            <th>
-                                Marks
-                            </th>
-
-                            <th>
-                                Grade
-                            </th>
-
-                            <th>
-                                Grade Point
-                            </th>
-
-                            <th>
-                                Credit
-                            </th>
-
-                            <th>
-                                Credit Point
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                        </tr>
-
-                    </thead>
+            <p>
+                <strong>Roll No:</strong>
+                {{ student["Roll No"] }}
+            </p>
 
 
-                    <tbody>
+            <table border="1">
 
-                        {% for subject, data in student["subjects"].items() %}
-
-                            <tr>
-
-                                <td>
-                                    {{ subject }}
-                                </td>
-
-                                <td>
-                                    {{ data["marks"] }}
-                                </td>
-
-                                <td>
-                                    {{ data["grade"] }}
-                                </td>
-
-                                <td>
-                                    {{ data["grade_point"] }}
-                                </td>
-
-                                <td>
-                                    {{ data["credit"] }}
-                                </td>
-
-                                <td>
-                                    {{ data["credit_point"] }}
-                                </td>
-
-                                <td>
-                                    {{ data["status"] }}
-                                </td>
-
-                            </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-
-                <br>
-
-
-                <h3>Result Summary</h3>
-
-
-                <table border="1">
+                <thead>
 
                     <tr>
 
                         <th>
-                            Total Marks
+                            Subject
                         </th>
 
-                        <td>
-                            {{ student["total"] }}
-                            /
-                            {{ student["maximum_marks"] }}
-                        </td>
+                        <th>
+                            Marks
+                        </th>
+
+                        <th>
+                            Grade
+                        </th>
+
+                        <th>
+                            Grade Point
+                        </th>
+
+                        <th>
+                            Credit
+                        </th>
+
+                        <th>
+                            Credit Point
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
 
                     </tr>
 
+                </thead>
+
+
+                <tbody>
+
+                    {% for subject, data in student["subjects"].items() %}
 
                     <tr>
 
-                        <th>
-                            Percentage
-                        </th>
+                        <td>
+                            {{ subject }}
+                        </td>
 
                         <td>
-                            {{ student["percentage"] }}%
+                            {{ data["marks"] }}
+                        </td>
+
+                        <td>
+                            {{ data["grade"] }}
+                        </td>
+
+                        <td>
+                            {{ data["grade_point"] }}
+                        </td>
+
+                        <td>
+                            {{ data["credit"] }}
+                        </td>
+
+                        <td>
+                            {{ data["credit_point"] }}
+                        </td>
+
+                        <td>
+                            {{ data["status"] }}
                         </td>
 
                     </tr>
 
+                    {% endfor %}
 
-                    <tr>
+                </tbody>
 
-                        <th>
-                            Total Credits
-                        </th>
-
-                        <td>
-                            {{ student["total_credits"] }}
-                        </td>
-
-                    </tr>
+            </table>
 
 
-                    <tr>
-
-                        <th>
-                            Total Credit Points
-                        </th>
-
-                        <td>
-                            {{ student["total_credit_points"] }}
-                        </td>
-
-                    </tr>
+            <br>
 
 
-                    <tr>
-
-                        <th>
-                            SGPA
-                        </th>
-
-                        <td>
-                            <strong>
-                                {{ student["sgpa"] }}
-                            </strong>
-                        </td>
-
-                    </tr>
+            <h3>Result Summary</h3>
 
 
-                    <tr>
+            <table border="1">
 
-                        <th>
-                            Overall Result
-                        </th>
+                <tr>
 
-                        <td>
+                    <th>
+                        Total Marks
+                    </th>
 
-                            <strong>
-                                {{ student["result"] }}
-                            </strong>
+                    <td>
+                        {{ student["total"] }}
+                        /
+                        {{ student["maximum_marks"] }}
+                    </td>
 
-                        </td>
-
-                    </tr>
-
-                </table>
+                </tr>
 
 
-                <br>
+                <tr>
+
+                    <th>
+                        Percentage
+                    </th>
+
+                    <td>
+                        {{ student["percentage"] }}%
+                    </td>
+
+                </tr>
 
 
-                <a
-                    href="{{ url_for(
+                <tr>
+
+                    <th>
+                        Total Credits
+                    </th>
+
+                    <td>
+                        {{ student["total_credits"] }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th>
+                        Total Credit Points
+                    </th>
+
+                    <td>
+                        {{ student["total_credit_points"] }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th>
+                        SGPA
+                    </th>
+
+                    <td>
+                        <strong>
+                            {{ student["sgpa"] }}
+                        </strong>
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <th>
+                        CGPA
+                    </th>
+
+                    <td>
+                        <strong>
+                            {{ student["cgpa"] }}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            Based on current semester
+                        </small>
+
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th>
+                        Overall Result
+                    </th>
+
+                    <td>
+
+                        <strong>
+                            {{ student["result"] }}
+                        </strong>
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+
+            <br>
+
+
+            <a href="{{ url_for(
                         'generate_pdf',
                         roll_no=student['Roll No']
-                    ) }}"
-                >
+                    ) }}">
 
-                    <button type="button">
-                        Generate PDF
-                    </button>
+                <button type="button">
+                    Generate PDF
+                </button>
 
-                </a>
-
-
-                <br><br>
+            </a>
 
 
-                <a
-                    href="{{ url_for(
+            <br><br>
+
+
+            <a href="{{ url_for(
                         'preview_pdf',
                         roll_no=student['Roll No']
-                    ) }}"
-                >
+                    ) }}">
 
-                    <button type="button">
-                        Preview PDF
-                    </button>
+                <button type="button">
+                    Preview PDF
+                </button>
 
-                </a>
+            </a>
 
-            </div>
+        </div>
 
         {% endfor %}
 
