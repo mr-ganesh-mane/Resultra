@@ -1,28 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Resultra - Home</title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
-
-</head>
+{% extends "base.html" %}
 
 
-<body>
+{% block title %}
+    Resultra - Home
+{% endblock %}
 
-    <!-- Header -->
+
+{% block content %}
+
+<div class="container">
+
+    <!-- ========================= -->
+    <!-- Welcome -->
+    <!-- ========================= -->
 
     <h1>Resultra</h1>
 
@@ -38,10 +28,11 @@
     <hr>
 
 
-    <!-- Main Navigation -->
+    <!-- ========================= -->
+    <!-- Get Started -->
+    <!-- ========================= -->
 
     <h2>Get Started</h2>
-
 
     <p>
         <a href="{{ url_for('upload') }}">
@@ -49,13 +40,11 @@
         </a>
     </p>
 
-
     <p>
         <a href="{{ url_for('profiles') }}">
             Manage Result Profiles
         </a>
     </p>
-
 
     <p>
         <a href="{{ url_for('new_profile') }}">
@@ -67,7 +56,9 @@
     <hr>
 
 
+    <!-- ========================= -->
     <!-- Project Workflow -->
+    <!-- ========================= -->
 
     <h2>How Resultra Works</h2>
 
@@ -103,7 +94,9 @@
     <hr>
 
 
-    <!-- Current Features -->
+    <!-- ========================= -->
+    <!-- Features -->
+    <!-- ========================= -->
 
     <h2>Features</h2>
 
@@ -147,7 +140,9 @@
     <hr>
 
 
+    <!-- ========================= -->
     <!-- Quick Links -->
+    <!-- ========================= -->
 
     <h2>Quick Links</h2>
 
@@ -169,20 +164,6 @@
         </a>
     </p>
 
+</div>
 
-    <hr>
-
-
-    <!-- Footer -->
-
-    <p>
-        Resultra
-    </p>
-
-    <p>
-        Smart Results. Simple Generation.
-    </p>
-
-</body>
-
-</html>
+{% endblock %}

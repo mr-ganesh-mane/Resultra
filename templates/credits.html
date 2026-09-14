@@ -1,168 +1,170 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Subject Credits - Resultra</title>
-
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
-
-</head>
-
-<body>
-
-    <div class="container">
-
-        <h1>Subject Credits</h1>
-
-        <p>
-            Configure credits for the subjects in the uploaded Excel file.
-        </p>
-
-        <p>
-            Profile:
-            <strong>{{ profile_name }}</strong>
-        </p>
+{% extends "base.html" %}
 
 
-        {% if error %}
-
-            <div class="error">
-                {{ error }}
-            </div>
-
-        {% endif %}
+{% block title %}
+    Subject Credits - Resultra
+{% endblock %}
 
 
-        {% if success %}
+{% block content %}
 
-            <div class="success">
-                {{ success }}
-            </div>
+<div class="container">
 
-        {% endif %}
+    <!-- ========================= -->
+    <!-- Page Heading -->
+    <!-- ========================= -->
+
+    <h1>Subject Credits</h1>
+
+    <p>
+        Configure credits for the subjects in the uploaded Excel file.
+    </p>
+
+    <p>
+        Profile:
+        <strong>{{ profile_name }}</strong>
+    </p>
 
 
-        {% if subjects %}
+    <!-- ========================= -->
+    <!-- Messages -->
+    <!-- ========================= -->
 
-            <form
-                method="POST"
-                action="{{ url_for('configure_credits') }}"
-            >
+    {% if error %}
 
-                <h2>Subjects</h2>
+        <div class="error">
+            {{ error }}
+        </div>
 
-                <table border="1">
+    {% endif %}
 
-                    <thead>
+
+    {% if success %}
+
+        <div class="success">
+            {{ success }}
+        </div>
+
+    {% endif %}
+
+
+    <!-- ========================= -->
+    <!-- Subjects -->
+    <!-- ========================= -->
+
+    {% if subjects %}
+
+        <form
+            method="POST"
+            action="{{ url_for('configure_credits') }}"
+        >
+
+            <h2>Subjects</h2>
+
+            <table class="credits-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Subject
+                        </th>
+
+                        <th>
+                            Credit
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for subject in subjects %}
 
                         <tr>
 
-                            <th>
-                                Subject
-                            </th>
+                            <td>
 
-                            <th>
-                                Credit
-                            </th>
+                                {{ subject }}
+
+                                <input
+                                    type="hidden"
+                                    name="subject"
+                                    value="{{ subject }}"
+                                >
+
+                            </td>
+
+
+                            <td>
+
+                                <input
+                                    type="number"
+                                    name="credit"
+                                    value="{{ subject_credits.get(
+                                        subject,
+                                        0
+                                    ) }}"
+                                    min="0"
+                                    step="0.5"
+                                    required
+                                >
+
+                            </td>
 
                         </tr>
 
-                    </thead>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
 
 
-                    <tbody>
-
-                        {% for subject in subjects %}
-
-                            <tr>
-
-                                <td>
-
-                                    {{ subject }}
-
-                                    <input
-                                        type="hidden"
-                                        name="subject"
-                                        value="{{ subject }}"
-                                    >
-
-                                </td>
+            <br>
 
 
-                                <td>
+            <!-- ========================= -->
+            <!-- Save -->
+            <!-- ========================= -->
 
-                                    <input
-                                        type="number"
-                                        name="credit"
-                                        value="{{ subject_credits.get(subject, 0) }}"
-                                        min="0"
-                                        step="0.5"
-                                        required
-                                    >
+            <button type="submit">
+                Save Credits & Calculate Result
+            </button>
 
-                                </td>
+        </form>
 
-                            </tr>
+    {% else %}
 
-                        {% endfor %}
+        <p>
+            No subjects detected.
+        </p>
 
-                    </tbody>
-
-                </table>
+    {% endif %}
 
 
-                <br>
+    <hr>
 
 
-                <button type="submit">
-                    Save Credits & Calculate Result
-                </button>
+    <!-- ========================= -->
+    <!-- Navigation -->
+    <!-- ========================= -->
 
-            </form>
-
-        {% else %}
-
-            <p>
-                No subjects detected.
-            </p>
-
-        {% endif %}
-
-
-        <br><br>
-
-
+    <p>
         <a href="{{ url_for('upload') }}">
             Back to Upload
         </a>
+    </p>
 
-        <br><br>
-
-
+    <p>
         <a href="{{ url_for('profiles') }}">
             Back to Profiles
         </a>
+    </p>
 
-        <br><br>
+</div>
 
-
-        <a href="{{ url_for('home') }}">
-            Home
-        </a>
-
-    </div>
-
-</body>
-
-</html>
+{% endblock %}

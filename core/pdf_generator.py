@@ -47,22 +47,22 @@ def get_page_size(design=None):
         "portrait"
     )
 
-    # Page size
+    # --------------------------------
+    # Page Size
+    # --------------------------------
+
     if page_size == "LETTER":
-
         page = LETTER
-
     else:
-
         page = A4
 
+    # --------------------------------
     # Orientation
+    # --------------------------------
+
     if orientation == "landscape":
-
         page = landscape(page)
-
     else:
-
         page = portrait(page)
 
     return page
@@ -82,11 +82,12 @@ def generate_student_pdf(
 
     Uses the reusable profile for:
     - College Name
-    - Page size
+    - Page Size
     - Orientation
-    - Header
-    - Footer
-    - Profile information
+    - Header Title
+    - Header Subtitle
+    - Footer Text
+    - Profile Information
     """
 
     # --------------------------------
@@ -143,15 +144,6 @@ def generate_student_pdf(
 
     styles = getSampleStyleSheet()
 
-    title_style = ParagraphStyle(
-        "ResultTitle",
-        parent=styles["Title"],
-        alignment=TA_CENTER,
-        fontSize=18,
-        leading=22,
-        spaceAfter=6
-    )
-
     college_style = ParagraphStyle(
         "CollegeName",
         parent=styles["Title"],
@@ -159,6 +151,15 @@ def generate_student_pdf(
         fontSize=20,
         leading=24,
         spaceAfter=4
+    )
+
+    title_style = ParagraphStyle(
+        "ResultTitle",
+        parent=styles["Heading1"],
+        alignment=TA_CENTER,
+        fontSize=18,
+        leading=22,
+        spaceAfter=6
     )
 
     subtitle_style = ParagraphStyle(
@@ -170,18 +171,12 @@ def generate_student_pdf(
         spaceAfter=5
     )
 
-    center_style = ParagraphStyle(
-        "Center",
-        parent=styles["Normal"],
-        alignment=TA_CENTER,
-        fontSize=10
-    )
-
     footer_style = ParagraphStyle(
         "Footer",
         parent=styles["Normal"],
         alignment=TA_CENTER,
-        fontSize=8
+        fontSize=8,
+        leading=10
     )
 
     story = []
@@ -209,7 +204,7 @@ def generate_student_pdf(
         story.append(
             Paragraph(
                 header_title,
-                subtitle_style
+                title_style
             )
         )
 
@@ -221,8 +216,6 @@ def generate_student_pdf(
                 subtitle_style
             )
         )
-
-    # Header separator
 
     story.append(
         Spacer(1, 4)
@@ -272,28 +265,33 @@ def generate_student_pdf(
     )
 
     profile_info = [
+
         [
             "Department",
             department,
             "Course",
             course
         ],
+
         [
             "Class",
             class_name,
             "Semester",
             semester
         ],
+
         [
             "Academic Year",
             academic_year,
             "Examination",
             examination
         ]
+
     ]
 
     profile_table = Table(
         profile_info,
+
         colWidths=[
             30 * mm,
             45 * mm,
@@ -304,6 +302,7 @@ def generate_student_pdf(
 
     profile_table.setStyle(
         TableStyle([
+
             (
                 "GRID",
                 (0, 0),
@@ -353,6 +352,7 @@ def generate_student_pdf(
                 (-1, -1),
                 6
             )
+
         ])
     )
 
@@ -368,29 +368,37 @@ def generate_student_pdf(
     # STUDENT INFORMATION
     # ========================================
 
+    student_name = str(
+        student_result.get(
+            "Student Name",
+            ""
+        )
+    )
+
+    roll_no = str(
+        student_result.get(
+            "Roll No",
+            ""
+        )
+    )
+
     student_info = [
+
         [
             "Student Name",
-            str(
-                student_result.get(
-                    "Student Name",
-                    ""
-                )
-            )
+            student_name
         ],
+
         [
             "Roll No",
-            str(
-                student_result.get(
-                    "Roll No",
-                    ""
-                )
-            )
+            roll_no
         ]
+
     ]
 
     student_table = Table(
         student_info,
+
         colWidths=[
             35 * mm,
             115 * mm
@@ -399,6 +407,7 @@ def generate_student_pdf(
 
     student_table.setStyle(
         TableStyle([
+
             (
                 "GRID",
                 (0, 0),
@@ -434,6 +443,7 @@ def generate_student_pdf(
                 (-1, -1),
                 7
             )
+
         ])
     )
 
@@ -524,6 +534,7 @@ def generate_student_pdf(
 
     subject_table = Table(
         subject_table_data,
+
         colWidths=[
             38 * mm,
             18 * mm,
@@ -533,11 +544,13 @@ def generate_student_pdf(
             20 * mm,
             16 * mm
         ],
+
         repeatRows=1
     )
 
     subject_table.setStyle(
         TableStyle([
+
             (
                 "GRID",
                 (0, 0),
@@ -587,6 +600,7 @@ def generate_student_pdf(
                 (-1, -1),
                 5
             )
+
         ])
     )
 
@@ -611,7 +625,6 @@ def generate_student_pdf(
                 f"{student_result.get('total', 0)} / "
                 f"{student_result.get('maximum_marks', 0)}"
             )
-
         ],
 
         [
@@ -620,7 +633,6 @@ def generate_student_pdf(
             (
                 f"{student_result.get('percentage', 0)}%"
             )
-
         ],
 
         [
@@ -632,7 +644,6 @@ def generate_student_pdf(
                     0
                 )
             )
-
         ],
 
         [
@@ -644,7 +655,6 @@ def generate_student_pdf(
                     0
                 )
             )
-
         ],
 
         [
@@ -656,7 +666,6 @@ def generate_student_pdf(
                     0
                 )
             )
-
         ],
 
         [
@@ -668,7 +677,6 @@ def generate_student_pdf(
                     0
                 )
             )
-
         ],
 
         [
@@ -680,13 +688,13 @@ def generate_student_pdf(
                     ""
                 )
             )
-
         ]
 
     ]
 
     summary_table = Table(
         summary_data,
+
         colWidths=[
             75 * mm,
             75 * mm
@@ -695,6 +703,7 @@ def generate_student_pdf(
 
     summary_table.setStyle(
         TableStyle([
+
             (
                 "GRID",
                 (0, 0),
@@ -744,6 +753,7 @@ def generate_student_pdf(
                 (-1, -1),
                 6
             )
+
         ])
     )
 
@@ -760,10 +770,6 @@ def generate_student_pdf(
     # ========================================
 
     if footer_text:
-
-        story.append(
-            Spacer(1, 12)
-        )
 
         story.append(
             HRFlowable(

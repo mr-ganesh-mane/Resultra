@@ -1,277 +1,279 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
 
-    <meta charset="UTF-8">
+{% block title %}
+    PDF Template & Design - Resultra
+{% endblock %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+
+{% block content %}
+
+<div class="container">
+
+    <!-- ========================= -->
+    <!-- Page Heading -->
+    <!-- ========================= -->
+
+    <h1>PDF Template & Design</h1>
+
+    <p>
+        Configure the PDF template and design for:
+        <strong>{{ profile_name }}</strong>
+    </p>
+
+
+    <!-- ========================= -->
+    <!-- Messages -->
+    <!-- ========================= -->
+
+    {% if success %}
+
+        <div class="success">
+            {{ success }}
+        </div>
+
+    {% endif %}
+
+
+    {% if error %}
+
+        <div class="error">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'profile_design',
+            profile_name=profile_name
+        ) }}"
     >
 
-    <title>PDF Template & Design - Resultra</title>
+        <!-- ========================= -->
+        <!-- Page Settings -->
+        <!-- ========================= -->
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
-
-</head>
+        <h2>Page Settings</h2>
 
 
-<body>
+        <label for="page_size">
+            Page Size
+        </label>
 
-    <div class="container">
-
-        <h1>PDF Template & Design</h1>
-
-        <p>
-            Configure the PDF template and design for:
-            <strong>{{ profile_name }}</strong>
-        </p>
-
-
-        {% if success %}
-
-            <div class="success">
-                {{ success }}
-            </div>
-
-        {% endif %}
-
-
-        {% if error %}
-
-            <div class="error">
-                {{ error }}
-            </div>
-
-        {% endif %}
-
-
-        <form
-            method="POST"
-            action="{{ url_for(
-                'profile_design',
-                profile_name=profile_name
-            ) }}"
+        <select
+            id="page_size"
+            name="page_size"
+            required
         >
 
-
-            <!-- ========================= -->
-            <!-- Page Settings -->
-            <!-- ========================= -->
-
-            <h2>Page Settings</h2>
-
-
-            <label for="page_size">
-                Page Size
-            </label>
-
-            <select
-                id="page_size"
-                name="page_size"
-                required
+            <option
+                value="A4"
+                {% if design.get('page_size', 'A4') == 'A4' %}
+                    selected
+                {% endif %}
             >
-
-                <option
-                    value="A4"
-                    {% if design.get('page_size', 'A4') == 'A4' %}
-                        selected
-                    {% endif %}
-                >
-                    A4
-                </option>
+                A4
+            </option>
 
 
-                <option
-                    value="LETTER"
-                    {% if design.get('page_size') == 'LETTER' %}
-                        selected
-                    {% endif %}
-                >
-                    Letter
-                </option>
-
-            </select>
-
-
-            <br><br>
-
-
-            <label for="orientation">
-                Orientation
-            </label>
-
-            <select
-                id="orientation"
-                name="orientation"
-                required
+            <option
+                value="LETTER"
+                {% if design.get('page_size') == 'LETTER' %}
+                    selected
+                {% endif %}
             >
+                Letter
+            </option>
 
-                <option
-                    value="portrait"
-                    {% if design.get(
-                        'orientation',
-                        'portrait'
-                    ) == 'portrait' %}
-                        selected
-                    {% endif %}
-                >
-                    Portrait
-                </option>
-
-
-                <option
-                    value="landscape"
-                    {% if design.get('orientation') == 'landscape' %}
-                        selected
-                    {% endif %}
-                >
-                    Landscape
-                </option>
-
-            </select>
-
-
-            <!-- ========================= -->
-            <!-- Header -->
-            <!-- ========================= -->
-
-            <h2>Header</h2>
-
-
-            <label for="header_title">
-                Header Title
-            </label>
-
-            <input
-                type="text"
-                id="header_title"
-                name="header_title"
-                value="{{ design.get(
-                    'header_title',
-                    'STUDENT RESULT'
-                ) }}"
-                maxlength="100"
-            >
-
-
-            <br><br>
-
-
-            <label for="header_subtitle">
-                Header Subtitle
-            </label>
-
-            <input
-                type="text"
-                id="header_subtitle"
-                name="header_subtitle"
-                value="{{ design.get(
-                    'header_subtitle',
-                    ''
-                ) }}"
-                maxlength="150"
-            >
-
-
-            <!-- ========================= -->
-            <!-- Result Table -->
-            <!-- ========================= -->
-
-            <h2>Result Table</h2>
-
-            <p>
-                The result table will automatically contain:
-            </p>
-
-            <ul>
-
-                <li>Subject</li>
-
-                <li>Marks</li>
-
-                <li>Grade</li>
-
-                <li>Grade Point</li>
-
-                <li>Credit</li>
-
-                <li>Credit Point</li>
-
-                <li>Status</li>
-
-            </ul>
-
-
-            <!-- ========================= -->
-            <!-- Summary -->
-            <!-- ========================= -->
-
-            <h2>Result Summary</h2>
-
-            <p>
-                The PDF will automatically display:
-            </p>
-
-            <ul>
-
-                <li>Total Marks</li>
-
-                <li>Percentage</li>
-
-                <li>Total Credits</li>
-
-                <li>Total Credit Points</li>
-
-                <li>SGPA</li>
-
-                <li>CGPA</li>
-
-                <li>Overall Result</li>
-
-            </ul>
-
-
-            <!-- ========================= -->
-            <!-- Footer -->
-            <!-- ========================= -->
-
-            <h2>Footer</h2>
-
-
-            <label for="footer_text">
-                Footer Text
-            </label>
-
-            <input
-                type="text"
-                id="footer_text"
-                name="footer_text"
-                value="{{ design.get(
-                    'footer_text',
-                    'Generated by Resultra'
-                ) }}"
-                maxlength="150"
-            >
-
-
-            <br><br>
-
-
-            <button type="submit">
-                Save Template & Design
-            </button>
-
-        </form>
+        </select>
 
 
         <br><br>
 
 
+        <label for="orientation">
+            Orientation
+        </label>
+
+        <select
+            id="orientation"
+            name="orientation"
+            required
+        >
+
+            <option
+                value="portrait"
+                {% if design.get(
+                    'orientation',
+                    'portrait'
+                ) == 'portrait' %}
+                    selected
+                {% endif %}
+            >
+                Portrait
+            </option>
+
+
+            <option
+                value="landscape"
+                {% if design.get('orientation') == 'landscape' %}
+                    selected
+                {% endif %}
+            >
+                Landscape
+            </option>
+
+        </select>
+
+
+        <!-- ========================= -->
+        <!-- Header -->
+        <!-- ========================= -->
+
+        <h2>Header</h2>
+
+
+        <label for="header_title">
+            Header Title
+        </label>
+
+        <input
+            type="text"
+            id="header_title"
+            name="header_title"
+            value="{{ design.get(
+                'header_title',
+                'STUDENT RESULT'
+            ) }}"
+            maxlength="100"
+        >
+
+
+        <br><br>
+
+
+        <label for="header_subtitle">
+            Header Subtitle
+        </label>
+
+        <input
+            type="text"
+            id="header_subtitle"
+            name="header_subtitle"
+            value="{{ design.get(
+                'header_subtitle',
+                ''
+            ) }}"
+            maxlength="150"
+        >
+
+
+        <!-- ========================= -->
+        <!-- Result Table -->
+        <!-- ========================= -->
+
+        <h2>Result Table</h2>
+
+        <p>
+            The result table will automatically contain:
+        </p>
+
+        <ul>
+
+            <li>Subject</li>
+
+            <li>Marks</li>
+
+            <li>Grade</li>
+
+            <li>Grade Point</li>
+
+            <li>Credit</li>
+
+            <li>Credit Point</li>
+
+            <li>Status</li>
+
+        </ul>
+
+
+        <!-- ========================= -->
+        <!-- Result Summary -->
+        <!-- ========================= -->
+
+        <h2>Result Summary</h2>
+
+        <p>
+            The PDF will automatically display:
+        </p>
+
+        <ul>
+
+            <li>Total Marks</li>
+
+            <li>Percentage</li>
+
+            <li>Total Credits</li>
+
+            <li>Total Credit Points</li>
+
+            <li>SGPA</li>
+
+            <li>CGPA</li>
+
+            <li>Overall Result</li>
+
+        </ul>
+
+
+        <!-- ========================= -->
+        <!-- Footer -->
+        <!-- ========================= -->
+
+        <h2>Footer</h2>
+
+
+        <label for="footer_text">
+            Footer Text
+        </label>
+
+        <input
+            type="text"
+            id="footer_text"
+            name="footer_text"
+            value="{{ design.get(
+                'footer_text',
+                'Generated by Resultra'
+            ) }}"
+            maxlength="150"
+        >
+
+
+        <br><br>
+
+
+        <!-- ========================= -->
+        <!-- Save -->
+        <!-- ========================= -->
+
+        <button type="submit">
+            Save Template & Design
+        </button>
+
+    </form>
+
+
+    <hr>
+
+
+    <!-- ========================= -->
+    <!-- Navigation -->
+    <!-- ========================= -->
+
+    <p>
         <a
             href="{{ url_for(
                 'view_profile',
@@ -280,25 +282,14 @@
         >
             Back to Profile
         </a>
+    </p>
 
-
-        <br><br>
-
-
+    <p>
         <a href="{{ url_for('profiles') }}">
             Back to Profiles
         </a>
+    </p>
 
+</div>
 
-        <br><br>
-
-
-        <a href="{{ url_for('home') }}">
-            Home
-        </a>
-
-    </div>
-
-</body>
-
-</html>
+{% endblock %}

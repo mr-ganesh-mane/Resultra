@@ -1,92 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
 
-    <meta charset="UTF-8">
+{% block title %}
+    Upload Excel - Resultra
+{% endblock %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
 
-    <title>Upload Excel - Resultra</title>
+{% block content %}
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+<div class="container">
 
-</head>
-
-<body>
+    <!-- ========================= -->
+    <!-- Page Heading -->
+    <!-- ========================= -->
 
     <h1>Upload Excel File</h1>
 
 
+    <!-- ========================= -->
+    <!-- Selected Profile -->
+    <!-- ========================= -->
+
     {% if selected_profile %}
 
-        <p>
+        <div class="success">
+
             Selected Profile:
             <strong>{{ selected_profile }}</strong>
-        </p>
+
+        </div>
 
     {% else %}
 
-        <p>
-            No profile selected.
-        </p>
+        <div class="error">
 
-        <p>
-            You can select a profile from the
-            <a href="{{ url_for('profiles') }}">
-                Profiles
-            </a>
-            page.
-        </p>
+            <strong>No profile selected.</strong>
+
+            <p>
+                You can select a profile from the
+                <a href="{{ url_for('profiles') }}">
+                    Profiles
+                </a>
+                page.
+            </p>
+
+        </div>
 
     {% endif %}
 
+
+    <!-- ========================= -->
+    <!-- Success Message -->
+    <!-- ========================= -->
 
     {% if success %}
 
-        <p>
+        <div class="success">
             {{ success }}
-        </p>
+        </div>
 
     {% endif %}
 
+
+    <!-- ========================= -->
+    <!-- Error Message -->
+    <!-- ========================= -->
 
     {% if error %}
 
-        <p>
+        <div class="error">
             {{ error }}
-        </p>
+        </div>
 
     {% endif %}
 
+
+    <!-- ========================= -->
+    <!-- Validation Errors -->
+    <!-- ========================= -->
 
     {% if errors %}
 
-        <h3>Validation Errors</h3>
+        <div class="error">
 
-        <ul>
+            <h3>Validation Errors</h3>
 
-            {% for error in errors %}
+            <ul>
 
-                <li>
-                    {{ error }}
-                </li>
+                {% for error in errors %}
 
-            {% endfor %}
+                    <li>
+                        {{ error }}
+                    </li>
 
-        </ul>
+                {% endfor %}
+
+            </ul>
+
+        </div>
 
     {% endif %}
 
 
-    <h2>Upload Student Marks</h2>
+    <!-- ========================= -->
+    <!-- Upload Form -->
+    <!-- ========================= -->
 
+    <h2>Upload Student Marks</h2>
 
     <form
         action="{{ url_for('upload') }}"
@@ -97,9 +117,6 @@
         <label for="excel_file">
             Select Excel File:
         </label>
-
-        <br>
-        <br>
 
         <input
             type="file"
@@ -119,21 +136,25 @@
     </form>
 
 
-    <br>
-    <br>
+    <hr>
 
 
-    <a href="{{ url_for('profiles') }}">
-        Manage Profiles
-    </a>
+    <!-- ========================= -->
+    <!-- Navigation -->
+    <!-- ========================= -->
 
-    <br>
-    <br>
+    <p>
+        <a href="{{ url_for('profiles') }}">
+            Manage Profiles
+        </a>
+    </p>
 
-    <a href="{{ url_for('home') }}">
-        Back to Home
-    </a>
+    <p>
+        <a href="{{ url_for('home') }}">
+            Back to Home
+        </a>
+    </p>
 
-</body>
+</div>
 
-</html>
+{% endblock %}

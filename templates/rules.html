@@ -1,120 +1,225 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
 
-    <meta charset="UTF-8">
+{% block title %}
+    Result Rules - Resultra
+{% endblock %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
+
+{% block content %}
+
+<div class="container">
+
+    <!-- ========================= -->
+    <!-- Page Heading -->
+    <!-- ========================= -->
+
+    <h1>Result Rules</h1>
+
+    <p>
+        Configure result rules for profile:
+        <strong>{{ profile_name }}</strong>
+    </p>
+
+
+    <!-- ========================= -->
+    <!-- Messages -->
+    <!-- ========================= -->
+
+    {% if success %}
+
+        <div class="success">
+            {{ success }}
+        </div>
+
+    {% endif %}
+
+
+    {% if error %}
+
+        <div class="error">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'profile_rules',
+            profile_name=profile_name
+        ) }}"
     >
 
-    <title>Result Rules - Resultra</title>
+        <!-- ========================= -->
+        <!-- Basic Rules -->
+        <!-- ========================= -->
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
-
-</head>
+        <h2>Basic Rules</h2>
 
 
-<body>
+        <label for="passing_marks">
+            Passing Marks
+        </label>
 
-    <div class="container">
+        <input
+            type="number"
+            id="passing_marks"
+            name="passing_marks"
+            value="{{ rules.get('passing_marks', 40) }}"
+            min="0"
+            step="1"
+            required
+        >
 
-        <h1>Result Rules</h1>
+
+        <label for="max_marks_per_subject">
+            Maximum Marks Per Subject
+        </label>
+
+        <input
+            type="number"
+            id="max_marks_per_subject"
+            name="max_marks_per_subject"
+            value="{{ rules.get(
+                'max_marks_per_subject',
+                100
+            ) }}"
+            min="1"
+            step="1"
+            required
+        >
+
+
+        <!-- ========================= -->
+        <!-- Grade Rules -->
+        <!-- ========================= -->
+
+        <h2>Grade Rules</h2>
 
         <p>
-            Configure result rules for profile:
-            <strong>{{ profile_name }}</strong>
+            Enter the minimum marks, grade and
+            grade point for each grade.
         </p>
 
 
-        {% if success %}
+        <table class="rules-table">
 
-            <div class="success">
-                {{ success }}
-            </div>
+            <thead>
 
-        {% endif %}
+                <tr>
 
+                    <th>
+                        Minimum Marks
+                    </th>
 
-        {% if error %}
+                    <th>
+                        Grade
+                    </th>
 
-            <div class="error">
-                {{ error }}
-            </div>
+                    <th>
+                        Grade Point
+                    </th>
 
-        {% endif %}
+                </tr>
 
-
-        <form
-            method="POST"
-            action="{{ url_for('profile_rules', profile_name=profile_name) }}"
-        >
-
-            <!-- ================================= -->
-            <!-- Basic Rules -->
-            <!-- ================================= -->
-
-            <h2>Basic Rules</h2>
+            </thead>
 
 
-            <label for="passing_marks">
-                Passing Marks
-            </label>
+            <tbody>
 
-            <input
-                type="number"
-                id="passing_marks"
-                name="passing_marks"
-                value="{{ rules.get('passing_marks', 40) }}"
-                min="0"
-                step="1"
-                required
-            >
+                {% for grade_rule in rules.get(
+                    'grade_ranges',
+                    []
+                ) %}
 
+                    <tr>
 
-            <label for="max_marks_per_subject">
-                Maximum Marks Per Subject
-            </label>
+                        <td>
 
-            <input
-                type="number"
-                id="max_marks_per_subject"
-                name="max_marks_per_subject"
-                value="{{ rules.get('max_marks_per_subject', 100) }}"
-                min="1"
-                step="1"
-                required
-            >
+                            <input
+                                type="number"
+                                name="min"
+                                value="{{ grade_rule.get(
+                                    'min',
+                                    0
+                                ) }}"
+                                min="0"
+                                step="1"
+                                required
+                            >
+
+                        </td>
 
 
-            <!-- ================================= -->
-            <!-- Grade Rules -->
-            <!-- ================================= -->
+                        <td>
 
-            <h2>Grade Rules</h2>
+                            <input
+                                type="text"
+                                name="grade"
+                                value="{{ grade_rule.get(
+                                    'grade',
+                                    ''
+                                ) }}"
+                                maxlength="10"
+                                required
+                            >
 
-            <p>
-                Enter the minimum marks, grade and
-                grade point for each grade.
-            </p>
+                        </td>
 
 
-            <table border="1">
+                        <td>
+
+                            <input
+                                type="number"
+                                name="grade_point"
+                                value="{{ grade_rule.get(
+                                    'grade_point',
+                                    0
+                                ) }}"
+                                min="0"
+                                step="0.01"
+                                required
+                            >
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        <!-- ========================= -->
+        <!-- Subject Credits -->
+        <!-- ========================= -->
+
+        <h2>Subject Credits</h2>
+
+        <p>
+            Enter the credit value for each subject.
+        </p>
+
+
+        {% if rules.get('subject_credits') %}
+
+            <table class="credits-table">
 
                 <thead>
 
                     <tr>
 
-                        <th>Minimum Marks</th>
+                        <th>
+                            Subject
+                        </th>
 
-                        <th>Grade</th>
-
-                        <th>Grade Point</th>
+                        <th>
+                            Credit
+                        </th>
 
                     </tr>
 
@@ -123,32 +228,23 @@
 
                 <tbody>
 
-                    {% for grade_rule in rules.get('grade_ranges', []) %}
+                    {% for subject, credit in
+                        rules.get(
+                            'subject_credits',
+                            {}
+                        ).items()
+                    %}
 
                         <tr>
 
                             <td>
 
-                                <input
-                                    type="number"
-                                    name="min"
-                                    value="{{ grade_rule.get('min', 0) }}"
-                                    min="0"
-                                    step="1"
-                                    required
-                                >
-
-                            </td>
-
-
-                            <td>
+                                {{ subject }}
 
                                 <input
-                                    type="text"
-                                    name="grade"
-                                    value="{{ grade_rule.get('grade', '') }}"
-                                    maxlength="10"
-                                    required
+                                    type="hidden"
+                                    name="subject"
+                                    value="{{ subject }}"
                                 >
 
                             </td>
@@ -158,10 +254,10 @@
 
                                 <input
                                     type="number"
-                                    name="grade_point"
-                                    value="{{ grade_rule.get('grade_point', 0) }}"
+                                    name="credit"
+                                    value="{{ credit }}"
                                     min="0"
-                                    step="0.01"
+                                    step="0.5"
                                     required
                                 >
 
@@ -175,126 +271,54 @@
 
             </table>
 
-
-            <!-- ================================= -->
-            <!-- Subject Credits -->
-            <!-- ================================= -->
-
-            <h2>Subject Credits</h2>
+        {% else %}
 
             <p>
-                Enter the credit value for each subject.
+                Subject credits will appear here after
+                uploading an Excel file.
             </p>
 
-
-            {% if rules.get('subject_credits') %}
-
-                <table border="1">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>Subject</th>
-
-                            <th>Credit</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        {% for subject, credit in rules.get('subject_credits', {}).items() %}
-
-                            <tr>
-
-                                <td>
-
-                                    {{ subject }}
-
-                                    <input
-                                        type="hidden"
-                                        name="subject"
-                                        value="{{ subject }}"
-                                    >
-
-                                </td>
-
-
-                                <td>
-
-                                    <input
-                                        type="number"
-                                        name="credit"
-                                        value="{{ credit }}"
-                                        min="0"
-                                        step="0.5"
-                                        required
-                                    >
-
-                                </td>
-
-                            </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            {% else %}
-
-                <p>
-                    Subject credits will appear here after
-                    uploading an Excel file.
-                </p>
-
-            {% endif %}
-
-
-            <br>
-
-
-            <!-- ================================= -->
-            <!-- Save -->
-            <!-- ================================= -->
-
-            <button type="submit">
-                Save Rules
-            </button>
-
-        </form>
+        {% endif %}
 
 
         <br>
 
 
+        <!-- ========================= -->
+        <!-- Save -->
+        <!-- ========================= -->
+
+        <button type="submit">
+            Save Rules
+        </button>
+
+    </form>
+
+
+    <hr>
+
+
+    <!-- ========================= -->
+    <!-- Navigation -->
+    <!-- ========================= -->
+
+    <p>
         <a
-            href="{{ url_for('view_profile', profile_name=profile_name) }}"
+            href="{{ url_for(
+                'view_profile',
+                profile_name=profile_name
+            ) }}"
         >
             Back to Profile
         </a>
+    </p>
 
-
-        <br><br>
-
-
+    <p>
         <a href="{{ url_for('profiles') }}">
             Back to Profiles
         </a>
+    </p>
 
+</div>
 
-        <br><br>
-
-
-        <a href="{{ url_for('home') }}">
-            Home
-        </a>
-
-    </div>
-
-</body>
-
-</html>
+{% endblock %}
