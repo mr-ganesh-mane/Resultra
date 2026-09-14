@@ -98,20 +98,27 @@ def read_excel(file_path):
     Detect the Excel format and read the data.
     """
 
-    excel_format = detect_excel_format(file_path)
+    excel_format = detect_excel_format(
+        file_path
+    )
+
+    # ------------------------------------------
+    # Single Sheet
+    # ------------------------------------------
 
     if excel_format == "single_sheet":
 
-        data = read_single_sheet(file_path)
+        data = read_single_sheet(
+            file_path
+        )
 
         return {
             "format": "single_sheet",
             "data": data
         }
 
-
     # ------------------------------------------
-    # Subject-Wise Excel
+    # Subject Wise
     # ------------------------------------------
 
     subject_data = read_subject_wise(
@@ -125,9 +132,9 @@ def read_excel(file_path):
     return {
         "format": "subject_wise",
 
-        # Combined data is used for calculation
+        # Combined data for result calculation
         "data": combined_data,
 
-        # Original sheets are used for validation
+        # Original subject sheets for validation
         "raw_data": subject_data
     }
